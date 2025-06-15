@@ -39,7 +39,6 @@ export default function DashboardPage() {
     );
   }
 
-  // At this point, isAuthenticated is true and isLoadingPage is false
   const dashboardCards = [
     {
       title: "Estadísticas del Agente",
@@ -126,24 +125,9 @@ export default function DashboardPage() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10 animate-slide-in-up [animation-delay:0.2s]">
-        {dashboardCards.slice(0,1).map((card) => ( 
-            <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-1 ${card.bgColor} border ${card.borderColor}`}>
-                 <CardHeader>
-                    <div className="flex items-center mb-1">
-                        <card.icon className={`h-7 w-7 mr-3 ${card.textColor}`} />
-                        <CardTitle className={`font-headline text-2xl ${card.textColor}`}>{card.title}</CardTitle>
-                    </div>
-                    <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {card.content}
-                    {card.action && <div className="mt-4">{card.action}</div>}
-                </CardContent>
-            </Card>
-        ))}
-         {dashboardCards.slice(1,2).map((card) => ( 
-            <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-2 ${card.bgColor} border ${card.borderColor}`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 animate-slide-in-up [animation-delay:0.2s]">
+        {dashboardCards.slice(0, 2).map((card) => ( 
+            <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 ${card.bgColor} border ${card.borderColor}`}>
                  <CardHeader>
                     <div className="flex items-center mb-1">
                         <card.icon className={`h-7 w-7 mr-3 ${card.textColor}`} />
@@ -158,8 +142,9 @@ export default function DashboardPage() {
             </Card>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-6 animate-slide-in-up [animation-delay:0.3s]">
-         {dashboardCards.slice(2).map((card) => ( 
+      
+      <div className="grid grid-cols-1 gap-6 animate-slide-in-up [animation-delay:0.3s]">
+         {dashboardCards.slice(2, 3).map((card) => ( 
             <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 ${card.bgColor} border ${card.borderColor}`}>
                  <CardHeader>
                     <div className="flex items-center mb-1">
