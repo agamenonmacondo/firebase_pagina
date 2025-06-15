@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import type { ImageProps as NextImageProps } from 'next/image';
 
+// No import for logoAsset needed when served from public
+
 interface AvaLogoIconProps extends Omit<NextImageProps, 'src' | 'alt'> {
-  // Default width and height for this specific logo, can be overridden by props.
   width?: number;
   height?: number;
   className?: string;
@@ -11,12 +12,12 @@ interface AvaLogoIconProps extends Omit<NextImageProps, 'src' | 'alt'> {
 export function AvaLogoIcon({ width = 75, height = 24, className, ...props }: AvaLogoIconProps) {
   return (
     <Image
-      src="/images/ava_logo.png" // Expects ava_logo.png in public/images/
+      src="/ava_logo.png" // Path relative to the public directory
       alt="AgenteAVA Logo"
-      width={width}
+      width={width} // Explicit width and height are generally required for public images
       height={height}
       className={className}
-      {...props} // Spread other valid NextImageProps
+      {...props}
     />
   );
 }
