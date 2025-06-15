@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // Removed SheetHeader, SheetTitle as they are not used directly here for mobile sidebar
-import Image from "next/image"; // Import Next.js Image component
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
 import {
   SendHorizonal,
   User,
@@ -33,8 +33,8 @@ interface Message {
   timestamp: Date;
   fileName?: string;
   fileType?: "image" | "audio" | "other";
-  imageUrl?: string; // For agent's hero image or specific image messages
-  imageAlt?: string; // Alt text for imageUrl
+  imageUrl?: string;
+  imageAlt?: string;
 }
 
 interface Conversation {
@@ -70,8 +70,8 @@ export default function HomePage() {
           id: crypto.randomUUID(),
           type: "agent",
           text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
-          imageUrl: "/images/hero-agente-ava.png", // Path to the hero image in public/images
-          imageAlt: "AgenteAVA",
+          imageUrl: "/images/ava_hero.png", // Updated path
+          imageAlt: "AgenteAVA Hero",
           timestamp: new Date(),
         },
       ],
@@ -122,7 +122,6 @@ export default function HomePage() {
     if (!currentConv) return;
 
     const updatedMessages = [...currentConv.messages, message];
-    // Update title only if it's the first user message (after agent's initial message) and text exists
     const newTitle = currentConv.messages.length === 1 && message.type === 'user' && message.text
       ? message.text.substring(0, 30) + "..."
       : currentConv.title;
@@ -183,7 +182,7 @@ export default function HomePage() {
       if (remainingConversations.length > 0) {
         setCurrentConversationId(remainingConversations[0].id);
       } else {
-        createNewConversation(); // Create a new one if all are deleted
+        createNewConversation(); 
       }
     }
     toast({
@@ -294,8 +293,8 @@ export default function HomePage() {
                               <Image
                                 src={message.imageUrl}
                                 alt={message.imageAlt || "Chat image"}
-                                width={300} // Constrained width for chat bubble
-                                height={343} // Adjusted height for 874x1000 aspect ratio
+                                width={300} 
+                                height={343} 
                                 className="rounded-md object-cover"
                                 data-ai-hint="agent portrait"
                               />
