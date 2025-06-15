@@ -3,9 +3,7 @@
 
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { PageContainer } from "@/components/shared/page-container";
-// No longer need AvaLogoIcon here for the chat messages, AvatarImage will handle the logo.
-// The image /images/ava_hero.png will be referenced directly from public.
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button"; // Imported buttonVariants
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +32,7 @@ interface Message {
   timestamp: Date;
   fileName?: string;
   fileType?: "image" | "audio" | "other";
-  imageUrl?: string; // For image previews in messages
+  imageUrl?: string; 
   imageAlt?: string;
 }
 
@@ -70,7 +68,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           type: "agent",
-          text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?", // No imageUrl here for the initial message
+          text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
           timestamp: new Date(),
         },
       ],
@@ -129,7 +127,7 @@ export default function HomePage() {
   };
 
 
-  const handleSubmitMessage = async (e?: FormEvent<HTMLFormElement>, text?: string, file?: {name: string, type: "image" | "audio" | "other"}) => {
+  const handleSubmitMessage = async (e?: FormEvent<HTMLFormElement>, text?: string, file?: {name: string, type: "image" | "audio" | "other", dataUrl?: string }) => {
     if (e) e.preventDefault();
     const messageText = text || inputValue.trim();
     if ((!messageText && !file) || isLoading || !currentConversationId) return;
@@ -141,6 +139,8 @@ export default function HomePage() {
       timestamp: new Date(),
       fileName: file?.name,
       fileType: file?.type,
+      imageUrl: file?.type === 'image' ? file.dataUrl : undefined,
+      imageAlt: file?.type === 'image' ? file.name : undefined,
     };
 
     addMessageToCurrentConversation(userMessage);
@@ -148,7 +148,6 @@ export default function HomePage() {
     if (!text) setInputValue(""); 
     setIsLoading(true);
 
-    // Simulate API call for Genkit
     setTimeout(() => {
       const agentResponse: Message = {
         id: crypto.randomUUID(),
@@ -170,45 +169,25 @@ export default function HomePage() {
         reader.onload = (loadEvent) => {
           const imageUrl = loadEvent.target?.result as string;
           // Add message with image preview for user
-          const userMessageWithImage: Message = {
-            id: crypto.randomUUID(),
-            type: "user",
-            text: inputValue.trim() || `Imagen adjunta: ${file.name}`,
-            timestamp: new Date(),
-            fileName: file.name,
-            fileType: "image",
-            imageUrl: imageUrl, // This will be the Data URL for the preview
-            imageAlt: file.name,
-          };
-          addMessageToCurrentConversation(userMessageWithImage);
-          setInputValue(""); // Clear input after image is shown
-          
-          // Simulate agent response after image upload
-          handleSubmitMessage(undefined, `Analizando imagen: ${file.name}`);
+          // For image uploads, we can directly use handleSubmitMessage to show the image and simulate processing
+          handleSubmitMessage(undefined, inputValue.trim() || `Imagen adjunta: ${file.name}`, { name: file.name, type: "image", dataUrl: imageUrl });
+          setInputValue(""); // Clear input after processing
+          toast({
+            title: "Imagen Adjuntada",
+            description: `${file.name} se ha adjuntado y se mostrará.`,
+          });
         };
         reader.readAsDataURL(file);
-        toast({
-          title: "Imagen Adjuntada",
-          description: `${file.name} se ha adjuntado y se mostrará.`,
-        });
       } else {
         // For non-image files, just announce the attachment.
-        addMessageToCurrentConversation({
-            id: crypto.randomUUID(),
-            type: "user",
-            text: inputValue.trim() || `Adjuntado: ${file.name}`,
-            timestamp: new Date(),
-            fileName: file.name,
-            fileType: fileType,
-        });
+        handleSubmitMessage(undefined, inputValue.trim() || `Adjuntado: ${file.name}`, { name: file.name, type: fileType });
         setInputValue("");
-        handleSubmitMessage(undefined, `Revisando archivo: ${file.name}`);
         toast({
           title: "Archivo Adjuntado",
           description: `${file.name} listo.`,
         });
       }
-      event.target.value = ""; // Reset file input
+      event.target.value = ""; 
     }
   };
   
@@ -240,13 +219,23 @@ export default function HomePage() {
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
           {conversations.map((conv) => (
-            <Button
+            <div
               key={conv.id}
-              variant={currentConversationId === conv.id ? "secondary" : "ghost"}
-              className="w-full justify-between h-auto py-2"
+              className={cn(
+                buttonVariants({ variant: currentConversationId === conv.id ? "secondary" : "ghost" }),
+                "w-full justify-between h-auto py-2 cursor-pointer flex items-center"
+              )}
               onClick={() => {
                 setCurrentConversationId(conv.id);
                 setIsMobileSidebarOpen(false);
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setCurrentConversationId(conv.id);
+                  setIsMobileSidebarOpen(false);
+                }
               }}
             >
               <span className="truncate text-left flex-1 pr-2">{conv.title}</span>
@@ -259,7 +248,7 @@ export default function HomePage() {
               >
                 <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive" />
               </Button>
-            </Button>
+            </div>
           ))}
         </div>
       </ScrollArea>
@@ -310,7 +299,6 @@ export default function HomePage() {
                       >
                         {message.type === "agent" && (
                           <Avatar className="h-8 w-8 border border-primary/20 shrink-0">
-                            {/* Use the image from public/images/ava_hero.png for the agent avatar */}
                             <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" />
                             <AvatarFallback className="bg-primary/20">
                               <BotMessageSquare className="h-5 w-5 text-primary" />
@@ -325,7 +313,7 @@ export default function HomePage() {
                               : "bg-muted text-foreground rounded-bl-none"
                           )}
                         >
-                          {message.imageUrl && message.type === 'user' && ( // Show image preview only for user messages for now
+                          {message.imageUrl && message.type === 'user' && ( 
                             <div className="mb-2">
                               <Image
                                 src={message.imageUrl} 
