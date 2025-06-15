@@ -112,5 +112,13 @@ body {
     @apply bg-background text-foreground;
     /* Apply transition for smooth theme changes */
     @apply transition-colors duration-300;
+
+    /* Animated GIF background */
+    /* Place your GIF in /public/images/animated-background.gif or update path below */
+    background-image: url('/images/animated-background.gif'); 
+    background-size: cover; /* Cover the entire viewport */
+    background-position: center center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Keep the background fixed during scroll */
   }
 }
