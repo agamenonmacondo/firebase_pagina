@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Home, LayoutList, Newspaper, LogIn } from 'lucide-react'; // Removed Network icon
+import { Home, LayoutList, Newspaper, LogIn, LayoutDashboard, Briefcase } from 'lucide-react'; // Added LayoutDashboard, Briefcase
 
 export interface NavItem {
   label: string;
@@ -7,11 +7,14 @@ export interface NavItem {
   icon: LucideIcon;
   authRequired?: boolean;
   hideWhenAuthed?: boolean;
+  isDashboard?: boolean; // Optional flag
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, authRequired: true, isDashboard: true },
   { label: 'AVA Assistant', href: '/', icon: Home },
   { label: 'AVA News', href: '/project', icon: LayoutList },
+  { label: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { label: 'Newsletter', href: '/newsletter', icon: Newspaper, authRequired: true },
   { label: 'Login', href: '/login', icon: LogIn, hideWhenAuthed: true },
 ];

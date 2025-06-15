@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/hooks/use-auth-store";
-import { useRouter } from "next/navigation"; // Corrected import
+import { useRouter } from "next/navigation"; 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -54,7 +55,7 @@ export function LoginForm() {
         title: "Login Successful",
         description: "Welcome back, Demo User!",
       });
-      router.push("/"); // Redirect to home or dashboard
+      router.push("/dashboard"); // Redirect to dashboard
     } else {
       toast({
         variant: "destructive",
