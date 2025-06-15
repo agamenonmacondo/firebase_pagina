@@ -11,7 +11,6 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, authRequired: true, isDashboard: true },
   { label: 'AVA Assistant', href: '/', icon: Home },
   { label: 'AVA News', href: '/project', icon: LayoutList },
