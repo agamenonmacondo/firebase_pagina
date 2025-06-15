@@ -26,23 +26,23 @@ export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     router.push("/login");
+  //   }
+  // }, [isAuthenticated, router]);
 
-  if (!isAuthenticated) {
-    return (
-      <PageContainer className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-        <Card className="text-center p-8">
-          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h1 className="text-2xl font-bold">Acceso Denegado</h1>
-          <p className="text-muted-foreground">Por favor, inicia sesión para acceder al dashboard.</p>
-        </Card>
-      </PageContainer>
-    );
-  }
+  // if (!isAuthenticated) {
+  //   return (
+  //     <PageContainer className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+  //       <Card className="text-center p-8">
+  //         <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+  //         <h1 className="text-2xl font-bold">Acceso Denegado</h1>
+  //         <p className="text-muted-foreground">Por favor, inicia sesión para acceder al dashboard.</p>
+  //       </Card>
+  //     </PageContainer>
+  //   );
+  // }
 
   const dashboardCards = [
     {
@@ -179,5 +179,3 @@ export default function DashboardPage() {
     </PageContainer>
   );
 }
-
-    
