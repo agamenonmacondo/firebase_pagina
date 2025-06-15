@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { usePathname } from "next/navigation"; // Added import
 
 interface WidgetMessage {
   id: string;
@@ -31,6 +32,8 @@ interface WidgetMessage {
 }
 
 export function GlobalChatWidget() {
+  const pathname = usePathname(); // Get current pathname
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<WidgetMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -97,11 +100,16 @@ export function GlobalChatWidget() {
     }, 1500);
   };
 
+  // Hide widget if on the main chat page ('/')
+  if (pathname === '/') {
+    return null;
+  }
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="default" // Changed from "primary" to "default"
+          variant="default"
           size="icon"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 bg-primary hover:bg-primary/90"
           aria-label="Abrir chat de AgenteAVA"
@@ -207,4 +215,3 @@ export function GlobalChatWidget() {
     </Popover>
   );
 }
-
