@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // Removed SheetHeader, SheetTitle as they are not used directly here for mobile sidebar
+import Image from "next/image"; // Import Next.js Image component
 import {
   SendHorizonal,
   User,
@@ -32,6 +33,8 @@ interface Message {
   timestamp: Date;
   fileName?: string;
   fileType?: "image" | "audio" | "other";
+  imageUrl?: string; // For agent's hero image or specific image messages
+  imageAlt?: string; // Alt text for imageUrl
 }
 
 interface Conversation {
@@ -40,8 +43,6 @@ interface Conversation {
   messages: Message[];
   createdAt: Date;
 }
-
-const initialAgentMessageText = "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?";
 
 export default function HomePage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -68,7 +69,9 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           type: "agent",
-          text: initialAgentMessageText,
+          text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
+          imageUrl: "/images/hero-agente-ava.png", // Path to the hero image in public/images
+          imageAlt: "AgenteAVA",
           timestamp: new Date(),
         },
       ],
@@ -107,7 +110,7 @@ export default function HomePage() {
     setConversations(prevConvs =>
       prevConvs.map(conv =>
         conv.id === convId
-          ? { ...conv, messages: newMessages, title: newTitle || (newMessages.find(m => m.type === 'user')?.text.substring(0,30) + "...") || conv.title }
+          ? { ...conv, messages: newMessages, title: newTitle || (newMessages.find(m => m.type === 'user' && m.text)?.text.substring(0,30) + "...") || conv.title }
           : conv
       ).sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())
     );
@@ -119,7 +122,8 @@ export default function HomePage() {
     if (!currentConv) return;
 
     const updatedMessages = [...currentConv.messages, message];
-    const newTitle = currentConv.messages.length === 1 && message.type === 'user' // Agent's first message is already there
+    // Update title only if it's the first user message (after agent's initial message) and text exists
+    const newTitle = currentConv.messages.length === 1 && message.type === 'user' && message.text
       ? message.text.substring(0, 30) + "..."
       : currentConv.title;
       
@@ -143,10 +147,9 @@ export default function HomePage() {
 
     addMessageToCurrentConversation(userMessage);
 
-    if (!text) setInputValue(""); // Clear input only if it was from the text input field
+    if (!text) setInputValue(""); 
     setIsLoading(true);
 
-    // Simulate agent response
     setTimeout(() => {
       const agentResponse: Message = {
         id: crypto.randomUUID(),
@@ -168,18 +171,19 @@ export default function HomePage() {
         title: "Archivo Seleccionado",
         description: `${file.name} listo para enviar. Escribe un mensaje si quieres y presiona Enter o el botón de enviar.`,
       });
-      // Reset file input value so the same file can be selected again
       event.target.value = "";
     }
   };
   
   const handleDeleteConversation = (e: React.MouseEvent, convId: string) => {
-    e.stopPropagation(); // Prevent selecting the conversation when deleting
+    e.stopPropagation(); 
     setConversations(prev => prev.filter(c => c.id !== convId));
     if (currentConversationId === convId) {
-      setCurrentConversationId(conversations.length > 1 ? conversations.filter(c => c.id !== convId)[0]?.id : null);
-      if (conversations.length <= 1) { // if it was the last one
-         createNewConversation();
+      const remainingConversations = conversations.filter(c => c.id !== convId);
+      if (remainingConversations.length > 0) {
+        setCurrentConversationId(remainingConversations[0].id);
+      } else {
+        createNewConversation(); // Create a new one if all are deleted
       }
     }
     toast({
@@ -230,7 +234,6 @@ export default function HomePage() {
 
   return (
     <PageContainer className="flex flex-col min-h-[calc(100vh-4rem)] p-0 md:flex-row">
-      {/* Mobile Sidebar Trigger & Sheet */}
       <div className="md:hidden p-2 border-b">
         <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
           <SheetTrigger asChild>
@@ -244,12 +247,10 @@ export default function HomePage() {
         </Sheet>
       </div>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden md:block md:w-80 lg:w-96 border-r">
         <SidebarContent />
       </aside>
 
-      {/* Main Chat Area */}
       <main className="flex-1 flex flex-col bg-background">
         <Card className="flex-1 flex flex-col shadow-none border-0 rounded-none max-w-full w-full mx-auto">
           {currentConversationId && conversations.find(c=>c.id === currentConversationId) ? (
@@ -271,7 +272,7 @@ export default function HomePage() {
                         )}
                       >
                         {message.type === "agent" && (
-                          <Avatar className="h-8 w-8 border border-primary/20">
+                          <Avatar className="h-8 w-8 border border-primary/20 shrink-0">
                             <AvatarImage asChild src="/ava_logo.png" alt="AgenteAVA">
                               <AvaLogoIcon width={32} height={32} />
                             </AvatarImage>
@@ -288,6 +289,18 @@ export default function HomePage() {
                               : "bg-muted text-foreground rounded-bl-none"
                           )}
                         >
+                          {message.imageUrl && (
+                            <div className="mb-2">
+                              <Image
+                                src={message.imageUrl}
+                                alt={message.imageAlt || "Chat image"}
+                                width={300} // Constrained width for chat bubble
+                                height={343} // Adjusted height for 874x1000 aspect ratio
+                                className="rounded-md object-cover"
+                                data-ai-hint="agent portrait"
+                              />
+                            </div>
+                          )}
                           {message.fileName && (
                              <div className="mb-1 p-2 border border-dashed rounded-md bg-black/10 dark:bg-white/10">
                                 <p className="text-xs font-medium flex items-center">
@@ -296,7 +309,9 @@ export default function HomePage() {
                                 </p>
                             </div>
                           )}
-                          <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
+                          {message.text && (
+                            <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
+                          )}
                           <p className={cn(
                               "text-xs mt-1",
                               message.type === "user" ? "text-primary-foreground/70 text-right" : "text-muted-foreground/70 text-left"
@@ -305,7 +320,7 @@ export default function HomePage() {
                           </p>
                         </div>
                         {message.type === "user" && (
-                          <Avatar className="h-8 w-8">
+                          <Avatar className="h-8 w-8 shrink-0">
                             <AvatarFallback className="bg-secondary">
                               <User className="h-5 w-5 text-secondary-foreground" />
                             </AvatarFallback>
@@ -373,5 +388,6 @@ export default function HomePage() {
     </PageContainer>
   );
 }
+    
 
     
