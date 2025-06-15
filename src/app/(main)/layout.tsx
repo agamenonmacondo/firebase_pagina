@@ -1,5 +1,7 @@
+
 import { Header } from '@/components/shared/header';
 import { Footer } from '@/components/shared/footer';
+import { GlobalChatWidget } from '@/components/shared/global-chat-widget'; // Added import
 
 export default function MainLayout({
   children,
@@ -11,6 +13,7 @@ export default function MainLayout({
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <GlobalChatWidget /> {/* Added GlobalChatWidget */}
     </div>
   );
 }
