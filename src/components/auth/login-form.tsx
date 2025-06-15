@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuthStore } from "@/hooks/use-auth-store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Loader2, LogIn } from "lucide-react";
+import { Loader2, LogIn, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { GoogleAuthProvider, signInWithPopup, type User } from "firebase/auth";
@@ -39,6 +39,7 @@ export function LoginForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isPhoneLoading, setIsPhoneLoading] = useState(false); // Added for phone
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -77,7 +78,6 @@ export function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const firebaseUser: User = result.user;
       
-      // Use Firebase user's details to log into the app's auth store
       login(firebaseUser.email || "user@example.com", firebaseUser.displayName || "Google User");
       
       toast({
@@ -98,6 +98,19 @@ export function LoginForm() {
     }
   };
 
+  const handlePhoneSignIn = async () => {
+    setIsPhoneLoading(true);
+    // Placeholder for phone authentication logic
+    // This will be a multi-step process involving RecaptchaVerifier and OTP
+    await new Promise(resolve => setTimeout(resolve, 500));
+    toast({
+      title: "Phone Sign-In (Not Implemented)",
+      description: "Phone sign-in functionality will be implemented soon.",
+    });
+    setIsPhoneLoading(false);
+  };
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -108,7 +121,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} disabled={isLoading || isGoogleLoading} />
+                <Input placeholder="you@example.com" {...field} disabled={isLoading || isGoogleLoading || isPhoneLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,7 +134,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} disabled={isLoading || isGoogleLoading} />
+                <Input type="password" placeholder="••••••••" {...field} disabled={isLoading || isGoogleLoading || isPhoneLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -138,7 +151,7 @@ export function LoginForm() {
                     checked={field.value}
                     onCheckedChange={field.onChange}
                     id="rememberMe"
-                    disabled={isLoading || isGoogleLoading}
+                    disabled={isLoading || isGoogleLoading || isPhoneLoading}
                   />
                 </FormControl>
                 <FormLabel htmlFor="rememberMe" className="font-normal cursor-pointer"> 
@@ -151,31 +164,46 @@ export function LoginForm() {
             Forgot password?
           </Link>
         </div>
-        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading || isPhoneLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Log In
         </Button>
       </form>
-      <div className="my-6 flex items-center">
+      <div className="my-4 flex items-center">
         <Separator className="flex-1" />
         <span className="mx-4 text-xs text-muted-foreground">OR CONTINUE WITH</span>
         <Separator className="flex-1" />
       </div>
-      <Button 
-        variant="outline" 
-        className="w-full" 
-        onClick={handleGoogleSignIn}
-        disabled={isLoading || isGoogleLoading}
-      >
-        {isGoogleLoading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-            <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.8 0 265.5S110.3 19 244 19c71.1 0 126.6 27.8 172.9 69.8l-69.2 67.3C317.7 131 284.4 115.8 244 115.8c-59.9 0-109.4 49.6-109.4 110.2s49.5 110.2 109.4 110.2c68.5 0 96.5-48.9 99.6-73.7H244v-83.8h235.9c2.3 12.7 3.7 26.6 3.7 42.7z"></path>
-          </svg>
-        )}
-        Sign in with Google
-      </Button>
+      <div className="space-y-3">
+        <Button 
+          variant="outline" 
+          className="w-full" 
+          onClick={handleGoogleSignIn}
+          disabled={isLoading || isGoogleLoading || isPhoneLoading}
+        >
+          {isGoogleLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+              <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.8 0 265.5S110.3 19 244 19c71.1 0 126.6 27.8 172.9 69.8l-69.2 67.3C317.7 131 284.4 115.8 244 115.8c-59.9 0-109.4 49.6-109.4 110.2s49.5 110.2 109.4 110.2c68.5 0 96.5-48.9 99.6-73.7H244v-83.8h235.9c2.3 12.7 3.7 26.6 3.7 42.7z"></path>
+            </svg>
+          )}
+          Sign in with Google
+        </Button>
+        <Button 
+          variant="outline" 
+          className="w-full" 
+          onClick={handlePhoneSignIn}
+          disabled={isLoading || isGoogleLoading || isPhoneLoading}
+        >
+          {isPhoneLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Phone className="mr-2 h-4 w-4" />
+          )}
+          Continue with Phone
+        </Button>
+      </div>
     </Form>
   );
 }
