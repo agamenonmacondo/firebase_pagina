@@ -1,7 +1,8 @@
+
 import { PageContainer } from "@/components/shared/page-container";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { CheckCircle, Target, Layers, Users } from "lucide-react";
+import { CheckCircle, Target, Layers, Users, Newspaper } from "lucide-react";
 
 export default function ProjectPage() {
   const techStack = [
@@ -120,6 +121,36 @@ export default function ProjectPage() {
             </ul>
           </CardContent>
         </Card>
+
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up [animation-delay:0.5s]">
+          <CardHeader>
+            <div className="flex items-center mb-2">
+              <Newspaper className="h-8 w-8 text-primary mr-3" />
+              <CardTitle className="font-headline text-3xl">Último Contenido Generado</CardTitle>
+            </div>
+            <CardDescription>
+              Aquí se mostraría el contenido más reciente generado por el Agente IA desde la sección Newsletter.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-xl mb-1 text-foreground">Título de Newsletter Ejemplo:</h4>
+              <p className="text-muted-foreground">"Desbloqueando el Futuro: Novedades en Inteligencia Artificial Aplicada"</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-xl mb-1 text-foreground">Extracto del Contenido:</h4>
+              <p className="text-muted-foreground line-clamp-4">
+                "En la edición de esta semana, exploramos cómo los últimos avances en aprendizaje automático están revolucionando industrias desde la medicina hasta la automoción.
+                Descubre herramientas innovadoras que pueden optimizar tus flujos de trabajo y cómo la IA generativa está abriendo nuevas fronteras creativas.
+                También analizamos las implicaciones éticas y los debates actuales en torno al desarrollo responsable de la IA. ¡No te pierdas nuestro análisis profundo y las entrevistas con expertos del sector!"
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground/80 pt-2">
+              (Este es un contenido de ejemplo. El contenido real generado en la pestaña "Newsletter" podría visualizarse aquí en una implementación futura.)
+            </p>
+          </CardContent>
+        </Card>
+
       </div>
     </PageContainer>
   );
