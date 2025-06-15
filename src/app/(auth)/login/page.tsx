@@ -14,7 +14,7 @@ export default function LoginPage() {
         <CardHeader className="text-center space-y-2">
           <AvaLogoIcon className="h-12 w-12 mx-auto text-primary" />
           <CardTitle className="font-headline text-3xl">Welcome Back</CardTitle>
-          <CardDescription>Log in to access AgenteAVA's AI newsletter tools.</CardDescription>
+          <CardDescription>Log in with your email or use Google to access AgenteAVA's AI newsletter tools.</CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />
