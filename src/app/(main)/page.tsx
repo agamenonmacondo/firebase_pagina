@@ -19,6 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger, // Added AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import {
   Accordion,
@@ -33,7 +34,7 @@ import {
   BotMessageSquare,
   MessageSquarePlus,
   PanelLeftOpen,
-  PanelLeftClose, // Added for desktop sidebar toggle
+  PanelLeftClose, 
   Paperclip,
   ImageUp,
   Mic,
@@ -68,7 +69,7 @@ export default function HomePage() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true); // State for desktop sidebar
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true); 
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -97,7 +98,7 @@ export default function HomePage() {
     setConversations((prev) => [newConversation, ...prev.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())]);
     setCurrentConversationId(newConversationId);
     inputRef.current?.focus();
-    setIsMobileSidebarOpen(false); // Close mobile sidebar on new chat
+    setIsMobileSidebarOpen(false); 
     return newConversationId;
   }, []);
 
@@ -544,6 +545,7 @@ export default function HomePage() {
     
 
     
+
 
 
 
