@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import type { ImageProps as NextImageProps } from 'next/image';
 
-// No import for logoAsset needed when served from public
-
 interface AvaLogoIconProps extends Omit<NextImageProps, 'src' | 'alt'> {
   width?: number;
   height?: number;
@@ -12,11 +10,12 @@ interface AvaLogoIconProps extends Omit<NextImageProps, 'src' | 'alt'> {
 export function AvaLogoIcon({ width = 75, height = 24, className, ...props }: AvaLogoIconProps) {
   return (
     <Image
-      src="/ava_logo.png" // Path relative to the public directory
+      src="/ava_logo.png" // This path is relative to the public directory
       alt="AgenteAVA Logo"
-      width={width} // Explicit width and height are generally required for public images
-      height={height}
+      width={width} // Default width if not overridden by className or specific props
+      height={height} // Default height if not overridden by className or specific props
       className={className}
+      priority // Add priority if this is a critical LCP element, e.g., in the header
       {...props}
     />
   );
