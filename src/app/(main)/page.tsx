@@ -4,8 +4,7 @@
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { PageContainer } from "@/components/shared/page-container";
 // No longer need AvaLogoIcon here for the chat messages, AvatarImage will handle the logo.
-// We will import the logo asset directly.
-import logoAsset from "../../lib/ava_logo.png"; // Import the logo asset
+// The image /images/ava_hero.png will be referenced directly from public.
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,7 +34,7 @@ interface Message {
   timestamp: Date;
   fileName?: string;
   fileType?: "image" | "audio" | "other";
-  imageUrl?: string;
+  imageUrl?: string; // For image previews in messages
   imageAlt?: string;
 }
 
@@ -71,7 +70,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           type: "agent",
-          text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
+          text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?", // No imageUrl here for the initial message
           timestamp: new Date(),
         },
       ],
@@ -178,7 +177,7 @@ export default function HomePage() {
             timestamp: new Date(),
             fileName: file.name,
             fileType: "image",
-            imageUrl: imageUrl,
+            imageUrl: imageUrl, // This will be the Data URL for the preview
             imageAlt: file.name,
           };
           addMessageToCurrentConversation(userMessageWithImage);
@@ -311,7 +310,8 @@ export default function HomePage() {
                       >
                         {message.type === "agent" && (
                           <Avatar className="h-8 w-8 border border-primary/20 shrink-0">
-                            <AvatarImage src={logoAsset} alt="AgenteAVA" />
+                            {/* Use the image from public/images/ava_hero.png for the agent avatar */}
+                            <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" />
                             <AvatarFallback className="bg-primary/20">
                               <BotMessageSquare className="h-5 w-5 text-primary" />
                             </AvatarFallback>
@@ -325,13 +325,13 @@ export default function HomePage() {
                               : "bg-muted text-foreground rounded-bl-none"
                           )}
                         >
-                          {message.imageUrl && message.type === 'user' && (
+                          {message.imageUrl && message.type === 'user' && ( // Show image preview only for user messages for now
                             <div className="mb-2">
                               <Image
                                 src={message.imageUrl} 
                                 alt={message.imageAlt || "Chat image"}
                                 width={300} 
-                                height={200} // Adjusted for better aspect ratio, assuming typical image uploads
+                                height={200} 
                                 className="rounded-md object-cover"
                                 data-ai-hint="user uploaded image"
                               />
