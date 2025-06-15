@@ -26,8 +26,8 @@ import { auth } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().email({ message: "Dirección de correo electrónico inválida." }),
+  password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
   rememberMe: z.boolean().optional(),
 });
 
@@ -59,15 +59,15 @@ export function LoginForm() {
     if (values.email === "agamenonmacondo@gmail.com" && values.password === "password") {
       login(values.email, "Agamenón Macondo"); 
       toast({
-        title: "Login Successful",
-        description: "Welcome back, Agamenón Macondo!",
+        title: "Inicio de Sesión Exitoso",
+        description: "¡Bienvenido de nuevo, Agamenón Macondo!",
       });
       router.push("/dashboard"); 
     } else {
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid email or password. Try agamenonmacondo@gmail.com and password.",
+        title: "Fallo en el Inicio de Sesión",
+        description: "Correo electrónico o contraseña incorrectos. Intenta con agamenonmacondo@gmail.com y password.",
       });
     }
     setIsLoading(false);
@@ -80,20 +80,20 @@ export function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const firebaseUser: User = result.user;
       
-      login(firebaseUser.email || "user@example.com", firebaseUser.displayName || "Google User");
+      login(firebaseUser.email || "user@example.com", firebaseUser.displayName || "Usuario Google");
       
       toast({
-        title: "Google Sign-In Successful",
-        description: `Welcome, ${firebaseUser.displayName || "User"}!`,
+        title: "Inicio de Sesión con Google Exitoso",
+        description: `¡Bienvenido, ${firebaseUser.displayName || "Usuario"}!`,
       });
       router.push("/dashboard");
 
     } catch (error: any) {
-      console.error("Error during Google sign-in:", error);
+      console.error("Error durante el inicio de sesión con Google:", error);
       toast({
         variant: "destructive",
-        title: "Google Sign-In Failed",
-        description: error.message || "An unknown error occurred during Google sign-in.",
+        title: "Fallo en el Inicio de Sesión con Google",
+        description: error.message || "Ocurrió un error desconocido durante el inicio de sesión con Google.",
       });
     } finally {
       setIsGoogleLoading(false);
@@ -102,12 +102,10 @@ export function LoginForm() {
 
   const handlePhoneSignIn = async () => {
     setIsPhoneLoading(true);
-    // Placeholder for phone authentication logic
-    // This will be a multi-step process involving RecaptchaVerifier and OTP
     await new Promise(resolve => setTimeout(resolve, 500));
     toast({
-      title: "Phone Sign-In (Not Implemented)",
-      description: "Phone sign-in functionality will be implemented soon.",
+      title: "Inicio de Sesión con Teléfono (No Implementado)",
+      description: "La funcionalidad de inicio de sesión con teléfono se implementará pronto.",
     });
     setIsPhoneLoading(false);
   };
@@ -121,9 +119,9 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Correo Electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} disabled={formIsSubmitting} />
+                <Input placeholder="tu@ejemplo.com" {...field} disabled={formIsSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,7 +132,7 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} disabled={formIsSubmitting} />
               </FormControl>
@@ -157,23 +155,23 @@ export function LoginForm() {
                   />
                 </FormControl>
                 <FormLabel htmlFor="rememberMe" className="font-normal cursor-pointer"> 
-                  Remember me
+                  Recordarme
                 </FormLabel>
               </FormItem>
             )}
           />
           <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
-            Forgot password?
+            ¿Olvidaste tu contraseña?
           </Link>
         </div>
         <Button type="submit" className="w-full" disabled={formIsSubmitting}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Log In
+          Iniciar Sesión
         </Button>
       </form>
       <div className="my-4 flex items-center">
         <Separator className="flex-1" />
-        <span className="mx-4 text-xs text-muted-foreground">OR CONTINUE WITH</span>
+        <span className="mx-4 text-xs text-muted-foreground">O CONTINUAR CON</span>
         <Separator className="flex-1" />
       </div>
       <div className="space-y-3">
@@ -190,7 +188,7 @@ export function LoginForm() {
               <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.8 0 265.5S110.3 19 244 19c71.1 0 126.6 27.8 172.9 69.8l-69.2 67.3C317.7 131 284.4 115.8 244 115.8c-59.9 0-109.4 49.6-109.4 110.2s49.5 110.2 109.4 110.2c68.5 0 96.5-48.9 99.6-73.7H244v-83.8h235.9c2.3 12.7 3.7 26.6 3.7 42.7z"></path>
             </svg>
           )}
-          Sign in with Google
+          Iniciar sesión con Google
         </Button>
         <Button 
           variant="outline" 
@@ -203,7 +201,7 @@ export function LoginForm() {
           ) : (
             <Phone className="mr-2 h-4 w-4" />
           )}
-          Continue with Phone
+          Continuar con Teléfono
         </Button>
       </div>
     </Form>

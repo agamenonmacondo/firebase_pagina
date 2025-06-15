@@ -21,7 +21,7 @@ import { auth } from "@/lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
+  email: z.string().email({ message: "Por favor, ingresa una dirección de correo electrónico válida." }),
 });
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
@@ -45,20 +45,20 @@ export function ForgotPasswordForm() {
       await sendPasswordResetEmail(auth, values.email);
       setEmailSent(true);
       toast({
-        title: "Password Reset Email Sent",
-        description: "Check your inbox for a link to reset your password. If you don't see it, check your spam folder.",
+        title: "Correo de Restablecimiento Enviado",
+        description: "Revisa tu bandeja de entrada para encontrar un enlace para restablecer tu contraseña. Si no lo ves, revisa tu carpeta de spam.",
       });
     } catch (error: any) {
-      console.error("Error sending password reset email:", error);
-      let errorMessage = "An unknown error occurred. Please try again.";
+      console.error("Error al enviar correo de restablecimiento:", error);
+      let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
       if (error.code === "auth/user-not-found") {
-        errorMessage = "No user found with this email address.";
+        errorMessage = "No se encontró ningún usuario con esta dirección de correo electrónico.";
       } else if (error.message) {
         errorMessage = error.message;
       }
       toast({
         variant: "destructive",
-        title: "Error Sending Email",
+        title: "Error al Enviar Correo",
         description: errorMessage,
       });
     }
@@ -69,8 +69,8 @@ export function ForgotPasswordForm() {
     return (
       <div className="text-center space-y-4 p-4 bg-green-500/10 text-green-700 dark:text-green-400 rounded-md">
         <Mail className="h-12 w-12 mx-auto text-primary" />
-        <h3 className="text-xl font-semibold">Check Your Email</h3>
-        <p>A password reset link has been sent to <strong>{form.getValues("email")}</strong>. Please follow the instructions in the email to reset your password.</p>
+        <h3 className="text-xl font-semibold">Revisa tu Correo Electrónico</h3>
+        <p>Se ha enviado un enlace para restablecer tu contraseña a <strong>{form.getValues("email")}</strong>. Por favor, sigue las instrucciones del correo para restablecer tu contraseña.</p>
       </div>
     );
   }
@@ -83,10 +83,10 @@ export function ForgotPasswordForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Dirección de Correo Electrónico</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="you@example.com" 
+                  placeholder="tu@ejemplo.com" 
                   {...field} 
                   disabled={isLoading}
                   type="email" 
@@ -102,7 +102,7 @@ export function ForgotPasswordForm() {
           ) : (
             <Mail className="mr-2 h-4 w-4" />
           )}
-          Send Password Reset Link
+          Enviar Enlace de Restablecimiento
         </Button>
       </form>
     </Form>

@@ -13,8 +13,8 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md shadow-2xl animate-slide-in-up">
         <CardHeader className="text-center space-y-2">
           <AvaLogoIcon className="h-12 w-12 mx-auto text-primary" />
-          <CardTitle className="font-headline text-3xl">Forgot Your Password?</CardTitle>
-          <CardDescription>Enter your email address and we'll send you a link to reset your password.</CardDescription>
+          <CardTitle className="font-headline text-3xl">¿Olvidaste Tu Contraseña?</CardTitle>
+          <CardDescription>Ingresa tu dirección de correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</CardDescription>
         </CardHeader>
         <CardContent>
           <ForgotPasswordForm />
@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
           <Button variant="link" asChild className="text-muted-foreground hover:text-primary">
             <Link href="/login">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Login
+              Volver a Iniciar Sesión
             </Link>
           </Button>
         </CardFooter>
