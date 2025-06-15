@@ -1,12 +1,11 @@
 
-"use client";
-
+import type { Metadata } from 'next';
 import { PageContainer } from "@/components/shared/page-container";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Maximize, Newspaper } from "lucide-react"; // Added Newspaper icon
+import { Maximize, Newspaper } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -62,26 +61,133 @@ const mockNewsData: NewsItem[] = [
   },
 ];
 
+// Helper function to parse Spanish date strings to ISO format
+// This needs to be defined at the module scope to be used in `metadata`
+function parseSpanishDateToISO(dateStr: string): string {
+  const parts = dateStr.split(" ");
+  if (parts.length < 3) return new Date().toISOString(); // Fallback
+
+  const monthName = parts[0].toLowerCase();
+  const day = parseInt(parts[1].replace(",", ""), 10);
+  const year = parseInt(parts[2], 10);
+
+  const monthMap: { [key: string]: number } = {
+    enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+    julio: 6, agosto: 7, septiembre: 8, octubre: 9, noviembre: 10, diciembre: 11
+  };
+
+  const month = monthMap[monthName];
+
+  if (isNaN(day) || isNaN(year) || month === undefined) {
+    return new Date().toISOString(); // Fallback for invalid dates
+  }
+  return new Date(year, month, day).toISOString();
+}
+
+const pageTitle = "AVA News - Últimas Noticias y Análisis de IA | AgenteAVA";
+const pageDescription = "Mantente al día con las últimas noticias, tendencias y análisis sobre Inteligencia Artificial, curadas y generadas por AgenteAVA. Artículos sobre IA en marketing, ética, y más.";
+const pageKeywords = "inteligencia artificial, IA, noticias de IA, AgenteAVA, Genkit, LangGraph, marketing digital, ética en IA, tendencias tecnológicas";
+const canonicalUrl = "/project"; // Assuming this is the final path. Update if path changes.
+const siteName = "AgenteAVA Showcase";
+const ogImageUrl = "https://placehold.co/1200x630.png"; // Generic OG image
+const publisherLogoUrl = "/images/ava_hero.png"; // Assumes this is in public/images/
+
+
+export const metadata: Metadata = {
+  title: pageTitle,
+  description: pageDescription,
+  keywords: pageKeywords,
+  alternates: {
+    canonical: canonicalUrl,
+  },
+  openGraph: {
+    title: pageTitle,
+    description: pageDescription,
+    url: canonicalUrl,
+    siteName: siteName,
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "Noticias de Inteligencia Artificial de AgenteAVA",
+      },
+    ],
+    type: 'website', // This page lists articles, so 'website' or 'blog' is appropriate
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: pageTitle,
+    description: pageDescription,
+    images: [ogImageUrl],
+  },
+  other: {
+    'application/ld+json': JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": pageTitle,
+      "description": pageDescription,
+      "url": canonicalUrl,
+      "publisher": {
+        "@type": "Organization",
+        "name": "AgenteAVA",
+        "logo": {
+          "@type": "ImageObject",
+          "url": publisherLogoUrl 
+        }
+      },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": mockNewsData.map((item, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "NewsArticle",
+            "headline": item.title,
+            "url": `${canonicalUrl}#${item.id}`, // Ideal: unique URL per article. Current: fragment.
+            "image": item.imageUrl,
+            "datePublished": parseSpanishDateToISO(item.date),
+            "dateModified": parseSpanishDateToISO(item.date), // Assuming no separate modified date for mock
+            "description": item.snippet,
+            "author": {
+              "@type": "Organization",
+              "name": "AgenteAVA"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "AgenteAVA",
+              "logo": {
+                "@type": "ImageObject",
+                "url": publisherLogoUrl
+              }
+            }
+          }
+        }))
+      }
+    }),
+  },
+};
+
 
 export default function AvaNewsPage() {
   return (
     <PageContainer className="py-8 px-4 sm:px-6 lg:px-8">
       <header className="mb-12 text-center">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 animate-slide-in-up">AVA News</h1>
+        <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 animate-slide-in-up">{pageTitle.split('|')[0].trim()}</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-in-up [animation-delay:0.1s]">
-          Las últimas noticias y análisis sobre Inteligencia Artificial, curadas y generadas por AgenteAVA.
+          {pageDescription.split('.')[0]}.
         </p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {mockNewsData.map((item, index) => (
           <Dialog key={item.id}>
-            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col animate-slide-in-up" style={{animationDelay: `${0.2 + index * 0.1}s`}}>
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col animate-slide-in-up" style={{animationDelay: `${0.2 + index * 0.1}s`}} id={item.id}>
               <DialogTrigger asChild>
                 <div className="relative cursor-pointer group">
                   <Image
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt={item.title} 
                     data-ai-hint={item.imageHint}
                     width={600}
                     height={400}
@@ -125,10 +231,12 @@ export default function AvaNewsPage() {
                     className="object-contain rounded-md"
                   />
                 </div>
-                <div
-                  className="prose dark:prose-invert max-w-none text-foreground leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: item.fullContent.replace(/\n/g, '<br />') }}
-                />
+                <article> {/* Added article tag for semantic content */}
+                  <div
+                    className="prose dark:prose-invert max-w-none text-foreground leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: item.fullContent.replace(/\n/g, '<br />') }}
+                  />
+                </article>
               </div>
               <div className="px-6 py-4 border-t">
                 <DialogClose asChild>
@@ -140,7 +248,6 @@ export default function AvaNewsPage() {
         ))}
       </div>
       
-      {/* New section for "Último Contenido Generado" */}
       <section className="mt-16 animate-slide-in-up" style={{animationDelay: `${0.2 + mockNewsData.length * 0.1 + 0.2}s`}}>
         <header className="mb-8 text-center">
           <h2 className="font-headline text-3xl md:text-4xl font-bold mb-3">Contenido Destacado por IA</h2>
