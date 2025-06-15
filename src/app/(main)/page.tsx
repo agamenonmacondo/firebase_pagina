@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger, // Added AlertDialogTrigger
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   Accordion,
@@ -118,7 +118,7 @@ export default function HomePage() {
         behavior: "smooth",
       });
     }
-  }, [currentMessages]);
+  }, [currentMessages, isLoading]); // Added isLoading to dependencies
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -465,6 +465,23 @@ export default function HomePage() {
                         )}
                       </div>
                     ))}
+                    {isLoading && (
+                      <div className="flex items-end gap-3 justify-start">
+                        <Avatar className="h-8 w-8 border border-primary/20 shrink-0">
+                          <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" />
+                          <AvatarFallback className="bg-primary/20">
+                            <BotMessageSquare className="h-5 w-5 text-primary" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="max-w-[70%] rounded-xl px-4 py-3 shadow bg-muted text-foreground rounded-bl-none">
+                          <div className="flex items-center space-x-1 h-5"> {/* Added h-5 for consistent height */}
+                            <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="h-2 w-2 bg-primary rounded-full animate-bounce"></span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>
@@ -549,3 +566,6 @@ export default function HomePage() {
 
 
 
+
+
+    
