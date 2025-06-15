@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageContainer } from "@/components/shared/page-container";
@@ -6,34 +7,34 @@ import { GenerateContentForm } from "@/components/newsletter/generate-content-fo
 import { DecideRelevanceForm } from "@/components/newsletter/decide-relevance-form";
 import { DetermineToneStructureForm } from "@/components/newsletter/determine-tone-structure-form";
 import { useAuthStore } from "@/hooks/use-auth-store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Edit3, CheckSquare, Sliders } from "lucide-react";
+import { LoadingSpinner } from "@/components/shared/loading-spinner";
 
 export default function NewsletterPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login");
+    } else {
+      setIsLoadingPage(false);
     }
   }, [isAuthenticated, router]);
 
-  if (!isAuthenticated) {
-    // Optional: show a loading state or a brief message before redirect
+  if (isLoadingPage) {
     return (
       <PageContainer className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-        <Card className="text-center p-8">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h1 className="text-2xl font-bold">Access Denied</h1>
-            <p className="text-muted-foreground">Please log in to access the newsletter tools.</p>
-        </Card>
+        <LoadingSpinner text="Verificando acceso..." />
       </PageContainer>
     );
   }
 
+  // At this point, isAuthenticated is true and isLoadingPage is false
   return (
     <PageContainer>
       <header className="mb-12 text-center">

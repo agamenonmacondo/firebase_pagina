@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/hooks/use-auth-store";
 import { PageContainer } from "@/components/shared/page-container";
@@ -12,34 +12,34 @@ import {
   BarChart3,
   FileText,
   Users,
-  AlertTriangle,
   PieChart,
   Activity,
 } from "lucide-react";
+import { LoadingSpinner } from "@/components/shared/loading-spinner";
 
 export default function DashboardPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
 
   useEffect(() => {
-    // if (!isAuthenticated) {
-    //   router.push("/login");
-    // }
+    if (!isAuthenticated) {
+      router.push("/login");
+    } else {
+      setIsLoadingPage(false);
+    }
   }, [isAuthenticated, router]);
 
-  // if (!isAuthenticated) {
-  //   return (
-  //     <PageContainer className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-  //       <Card className="text-center p-8">
-  //         <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-  //         <h1 className="text-2xl font-bold">Acceso Denegado</h1>
-  //         <p className="text-muted-foreground">Por favor, inicia sesión para acceder al dashboard.</p>
-  //       </Card>
-  //     </PageContainer>
-  //   );
-  // }
+  if (isLoadingPage) {
+    return (
+      <PageContainer className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+        <LoadingSpinner text="Verificando acceso..." />
+      </PageContainer>
+    );
+  }
 
+  // At this point, isAuthenticated is true and isLoadingPage is false
   const dashboardCards = [
     {
       title: "Estadísticas del Agente",
@@ -105,7 +105,7 @@ export default function DashboardPage() {
       content: (
         <div className="flex justify-center py-4">
           <Button asChild className="w-full max-w-md" size="lg">
-            <Link href="#"> {/* This link would go to a dedicated analytics page */}
+            <Link href="#">
               <BarChart3 className="mr-3 h-6 w-6" />
               Acceder a Analíticas Avanzadas
             </Link>
