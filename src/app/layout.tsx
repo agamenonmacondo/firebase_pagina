@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
@@ -6,10 +7,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'AgenteAVA Showcase',
   description: 'Showcasing the AgenteAVA project and its AI-powered newsletter capabilities.',
-  icons: {
-    // Consider adding a generic icon if specific one is not available
-    // icon: "/favicon.ico", 
-  }
+  // Removed icons key to prevent potential issues with favicon processing
 };
 
 export default function RootLayout({
