@@ -33,7 +33,7 @@ interface Message {
   timestamp: Date;
   fileName?: string;
   fileType?: "image" | "audio" | "other";
-  imageUrl?: string;
+  imageUrl?: string; // Still useful for potential image messages later, but not for the initial agent message
   imageAlt?: string;
 }
 
@@ -70,8 +70,7 @@ export default function HomePage() {
           id: crypto.randomUUID(),
           type: "agent",
           text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
-          imageUrl: "/images/ava_hero.png", // Updated path
-          imageAlt: "AgenteAVA Hero",
+          // No imageUrl or imageAlt here for the initial greeting
           timestamp: new Date(),
         },
       ],
@@ -165,12 +164,38 @@ export default function HomePage() {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fileType: "image" | "audio" | "other") => {
     const file = event.target.files?.[0];
     if (file) {
-      handleSubmitMessage(undefined, `Archivo adjunto: ${file.name}`, { name: file.name, type: fileType });
-      toast({
-        title: "Archivo Seleccionado",
-        description: `${file.name} listo para enviar. Escribe un mensaje si quieres y presiona Enter o el botón de enviar.`,
-      });
-      event.target.value = "";
+      // For simulation, we'll add the file name.
+      // If it's an image, we could potentially read it as a data URL for display
+      if (fileType === "image" && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (loadEvent) => {
+          const imageUrl = loadEvent.target?.result as string;
+          addMessageToCurrentConversation({
+            id: crypto.randomUUID(),
+            type: "user",
+            text: inputValue.trim() || `Adjuntada imagen: ${file.name}`,
+            timestamp: new Date(),
+            fileName: file.name,
+            fileType: "image",
+            imageUrl: imageUrl, // Store for display
+            imageAlt: file.name,
+          });
+          setInputValue("");
+          handleSubmitMessage(undefined, `Continuación de la imagen ${file.name}`); // Trigger agent response
+        };
+        reader.readAsDataURL(file);
+         toast({
+          title: "Imagen Adjuntada",
+          description: `${file.name} se ha adjuntado y se mostrará.`,
+        });
+      } else {
+        handleSubmitMessage(undefined, `Archivo adjunto: ${file.name}`, { name: file.name, type: fileType });
+        toast({
+          title: "Archivo Seleccionado",
+          description: `${file.name} listo para enviar. Escribe un mensaje si quieres y presiona Enter o el botón de enviar.`,
+        });
+      }
+      event.target.value = ""; // Reset file input
     }
   };
   
@@ -272,7 +297,8 @@ export default function HomePage() {
                       >
                         {message.type === "agent" && (
                           <Avatar className="h-8 w-8 border border-primary/20 shrink-0">
-                            <AvatarImage asChild src="/ava_logo.png" alt="AgenteAVA">
+                            {/* AvaLogoIcon should now be reliably sourced from src/lib/ava_logo.png */}
+                            <AvatarImage asChild src="" alt="AgenteAVA"> 
                               <AvaLogoIcon width={32} height={32} />
                             </AvatarImage>
                             <AvatarFallback className="bg-primary/20">
@@ -288,22 +314,22 @@ export default function HomePage() {
                               : "bg-muted text-foreground rounded-bl-none"
                           )}
                         >
-                          {message.imageUrl && (
+                          {message.imageUrl && message.type === 'user' && ( // Only display user uploaded images for now
                             <div className="mb-2">
                               <Image
-                                src={message.imageUrl}
+                                src={message.imageUrl} // This will be a data URI for user uploads
                                 alt={message.imageAlt || "Chat image"}
                                 width={300} 
-                                height={343} 
+                                height={343} // Adjust as needed, or make it dynamic
                                 className="rounded-md object-cover"
-                                data-ai-hint="agent portrait"
+                                data-ai-hint="user uploaded image" // Generic hint
                               />
                             </div>
                           )}
-                          {message.fileName && (
+                          {message.fileName && message.type === 'user' && message.fileType !== 'image' && ( // Show non-image file names
                              <div className="mb-1 p-2 border border-dashed rounded-md bg-black/10 dark:bg-white/10">
                                 <p className="text-xs font-medium flex items-center">
-                                {message.fileType === 'image' ? <ImageUp className="h-4 w-4 mr-2 shrink-0" /> : message.fileType === 'audio' ? <Mic className="h-4 w-4 mr-2 shrink-0" /> : <Paperclip className="h-4 w-4 mr-2 shrink-0" />}
+                                {message.fileType === 'audio' ? <Mic className="h-4 w-4 mr-2 shrink-0" /> : <Paperclip className="h-4 w-4 mr-2 shrink-0" />}
                                 {message.fileName}
                                 </p>
                             </div>
@@ -388,5 +414,4 @@ export default function HomePage() {
   );
 }
     
-
     
