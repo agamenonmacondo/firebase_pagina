@@ -1,157 +1,147 @@
 
+"use client";
+
+import { useState } from "react";
 import { PageContainer } from "@/components/shared/page-container";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
-import { CheckCircle, Target, Layers, Users, Newspaper } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { XIcon, Maximize } from "lucide-react";
 
-export default function ProjectPage() {
-  const techStack = [
-    { name: "Next.js", description: "React framework for server-side rendering and static site generation." },
-    { name: "TypeScript", description: "Strongly typed JavaScript for enhanced code quality." },
-    { name: "Tailwind CSS", description: "Utility-first CSS framework for rapid UI development." },
-    { name: "Shadcn/UI", description: "Reusable UI components built with Radix UI and Tailwind CSS." },
-    { name: "Firebase Genkit", description: "AI integration framework for building with large language models." },
-    { name: "Zod", description: "TypeScript-first schema declaration and validation." },
-  ];
+interface NewsItem {
+  id: string;
+  title: string;
+  snippet: string;
+  fullContent: string;
+  imageUrl: string;
+  imageHint: string;
+  category: string;
+  date: string;
+}
+
+const mockNewsData: NewsItem[] = [
+  {
+    id: "1",
+    title: "El Futuro de la IA en la Creación de Contenidos Multimedia",
+    snippet: "Descubre cómo las nuevas inteligencias artificiales están revolucionando la forma en que se generan imágenes, videos y música, abriendo un nuevo paradigma creativo...",
+    fullContent: "El avance exponencial de los modelos de IA generativa está transformando radicalmente el panorama de la creación de contenidos. Desde la generación de imágenes fotorrealistas a partir de descripciones textuales hasta la composición de piezas musicales originales y la creación de avatares digitales indistinguibles de los humanos, las posibilidades son infinitas. Herramientas como DALL-E 3, Midjourney y los modelos de generación de video de Google y Meta están democratizando el acceso a capacidades creativas que antes requerían equipos especializados y grandes presupuestos. Este artículo explora las implicaciones éticas, los desafíos técnicos y el potencial ilimitado de esta nueva era.",
+    imageUrl: "https://placehold.co/600x400.png",
+    imageHint: "AI creative tools",
+    category: "Inteligencia Artificial",
+    date: "Octubre 26, 2023"
+  },
+  {
+    id: "2",
+    title: "Agentes Autónomos de IA: ¿La Próxima Revolución Laboral?",
+    snippet: "Los agentes de IA capaces de realizar tareas complejas de forma autónoma están comenzando a emerger. Analizamos su impacto potencial en el mercado laboral...",
+    fullContent: "Imagina un asistente personal de IA que no solo agenda tus reuniones, sino que también investiga temas, redacta borradores de correos electrónicos y gestiona proyectos complejos con mínima supervisión. Esta es la promesa de los agentes autónomos de IA, sistemas que pueden comprender objetivos, planificar pasos y ejecutar tareas en el mundo digital e incluso físico. Empresas como Adept AI y OpenAI están liderando el desarrollo de estos agentes, que podrían automatizar una amplia gama- de trabajos de conocimiento. Si bien esto plantea preocupaciones sobre el desplazamiento laboral, también abre oportunidades para aumentar la productividad humana y crear nuevos roles centrados en la supervisión y el diseño de estos sistemas.",
+    imageUrl: "https://placehold.co/600x400.png",
+    imageHint: "AI workforce automation",
+    category: "Tecnología",
+    date: "Octubre 24, 2023"
+  },
+  {
+    id: "3",
+    title: "La Ética en la IA: Navegando los Desafíos de un Mundo Inteligente",
+    snippet: "A medida que la IA se vuelve más omnipresente, las discusiones sobre su uso ético y responsable son más cruciales que nunca. Abordamos los dilemas clave...",
+    fullContent: "Desde los sesgos algorítmicos que pueden perpetuar la discriminación hasta las preocupaciones sobre la privacidad en la era de la vigilancia masiva y el potencial de las armas autónomas, la IA presenta dilemas éticos complejos. Es fundamental establecer marcos regulatorios sólidos, promover la transparencia en los algoritmos y fomentar una cultura de desarrollo responsable. Organizaciones como la AI Ethics Lab y el Future of Life Institute están trabajando para guiar el desarrollo de la IA de manera que beneficie a toda la humanidad. Este artículo profundiza en los debates actuales y las posibles soluciones para garantizar que la IA se desarrolle de manera segura y equitativa.",
+    imageUrl: "https://placehold.co/600x400.png",
+    imageHint: "AI ethics debate",
+    category: "Sociedad",
+    date: "Octubre 20, 2023"
+  },
+];
+
+export default function AvaNewsPage() {
+  const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const openDialog = (item: NewsItem) => {
+    setSelectedNewsItem(item);
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedNewsItem(null);
+  };
 
   return (
-    <PageContainer>
+    <PageContainer className="py-8 px-4 sm:px-6 lg:px-8">
       <header className="mb-12 text-center">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 animate-slide-in-up">About AgenteAVA</h1>
+        <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 animate-slide-in-up">AVA News</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-in-up [animation-delay:0.1s]">
-          An in-depth look at the AgenteAVA project, its objectives, technology, and development process.
+          Las últimas noticias y análisis sobre Inteligencia Artificial, curadas y generadas por AgenteAVA.
         </p>
       </header>
 
-      <div className="space-y-12">
-        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up [animation-delay:0.2s]">
-          <div className="md:flex">
-            <div className="md:w-1/2">
-              <Image
-                src="https://placehold.co/800x600.png"
-                alt="Project Development"
-                data-ai-hint="project development"
-                width={800}
-                height={600}
-                className="object-cover w-full h-64 md:h-full"
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {mockNewsData.map((item, index) => (
+          <Card key={item.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col animate-slide-in-up" style={{animationDelay: `${0.2 + index * 0.1}s`}}>
+            <DialogTrigger asChild onClick={() => openDialog(item)}>
+              <div className="relative cursor-pointer group">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.title}
+                  data-ai-hint={item.imageHint}
+                  width={600}
+                  height={400}
+                  className="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Maximize className="h-12 w-12 text-white" />
+                </div>
+              </div>
+            </DialogTrigger>
+            <CardHeader>
+              <CardTitle className="font-headline text-xl line-clamp-2">{item.title}</CardTitle>
+              <div className="text-xs text-muted-foreground pt-1">
+                <span>{item.category}</span> - <span>{item.date}</span>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <p className="text-sm text-muted-foreground line-clamp-3">{item.snippet}</p>
+            </CardContent>
+            <div className="p-6 pt-0">
+               <Button variant="outline" className="w-full" onClick={() => openDialog(item)}>Leer más</Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {selectedNewsItem && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col p-0">
+            <DialogHeader className="p-6 pb-0">
+              <DialogTitle className="font-headline text-2xl md:text-3xl">{selectedNewsItem.title}</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                {selectedNewsItem.category} - {selectedNewsItem.date}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-grow overflow-y-auto px-6 pb-6 custom-scrollbar">
+              <div className="relative my-4 aspect-video">
+                <Image
+                  src={selectedNewsItem.imageUrl}
+                  alt={selectedNewsItem.title}
+                  data-ai-hint={selectedNewsItem.imageHint}
+                  fill
+                  className="object-contain rounded-md"
+                />
+              </div>
+              <div
+                className="prose dark:prose-invert max-w-none text-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: selectedNewsItem.fullContent.replace(/\n/g, '<br />') }}
               />
             </div>
-            <div className="md:w-1/2">
-              <CardHeader>
-                <div className="flex items-center mb-2">
-                  <Target className="h-8 w-8 text-primary mr-3" />
-                  <CardTitle className="font-headline text-3xl">Project Goals</CardTitle>
-                </div>
-                <CardDescription className="text-lg">
-                  Empowering users with AI-driven tools for efficient and effective newsletter creation and management.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground">
-                <p>AgenteAVA aims to simplify the complexities of content generation by leveraging the power of Generative AI. Our core objectives include:</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>Providing an intuitive platform for generating SEO-optimized newsletter content.</li>
-                  <li>Offering AI-powered analysis to determine content relevance for specific audiences.</li>
-                  <li>Assisting in defining the optimal tone and structure for newsletters to maximize engagement.</li>
-                  <li>Showcasing the capabilities of modern AI frameworks like Firebase Genkit.</li>
-                </ul>
-              </CardContent>
+            <div className="px-6 py-4 border-t">
+              <DialogClose asChild>
+                <Button variant="outline" onClick={closeDialog}>Cerrar</Button>
+              </DialogClose>
             </div>
-          </div>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up [animation-delay:0.3s]">
-          <CardHeader>
-            <div className="flex items-center mb-2">
-               <Layers className="h-8 w-8 text-primary mr-3" />
-               <CardTitle className="font-headline text-3xl">Technology Stack</CardTitle>
-            </div>
-            <CardDescription>
-              Built with a modern, robust, and scalable technology stack to deliver a seamless user experience.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {techStack.map((tech) => (
-                <div key={tech.name} className="p-4 border rounded-lg bg-background hover:border-primary transition-colors">
-                  <h3 className="font-semibold text-lg mb-1 text-foreground">{tech.name}</h3>
-                  <p className="text-sm text-muted-foreground">{tech.description}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up [animation-delay:0.4s]">
-           <CardHeader>
-            <div className="flex items-center mb-2">
-               <Users className="h-8 w-8 text-primary mr-3" />
-               <CardTitle className="font-headline text-3xl">Development Process</CardTitle>
-            </div>
-            <CardDescription>
-              Agile methodologies and a focus on user experience guided the development of AgenteAVA.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-muted-foreground">
-            <p>The development of AgenteAVA followed an iterative approach, focusing on delivering core AI functionalities first and then building the user interface around them. Key aspects of our process included:</p>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
-                <span>
-                  <strong>Feature Prioritization:</strong> Identifying and focusing on the most impactful AI features for newsletter management.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
-                <span>
-                  <strong>Modular Design:</strong> Creating reusable components and services for AI interactions and UI elements.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
-                <span>
-                  <strong>Continuous Refinement:</strong> Regularly reviewing and improving AI prompts and model interactions for better results.
-                </span>
-              </li>
-               <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
-                <span>
-                  <strong>Accessibility and UX:</strong> Ensuring the application is accessible and provides a smooth, intuitive user experience across devices and themes.
-                </span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up [animation-delay:0.5s]">
-          <CardHeader>
-            <div className="flex items-center mb-2">
-              <Newspaper className="h-8 w-8 text-primary mr-3" />
-              <CardTitle className="font-headline text-3xl">Último Contenido Generado</CardTitle>
-            </div>
-            <CardDescription>
-              Aquí se mostraría el contenido más reciente generado por el Agente IA desde la sección Newsletter.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h4 className="font-semibold text-xl mb-1 text-foreground">Título de Newsletter Ejemplo:</h4>
-              <p className="text-muted-foreground">"Desbloqueando el Futuro: Novedades en Inteligencia Artificial Aplicada"</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-xl mb-1 text-foreground">Extracto del Contenido:</h4>
-              <p className="text-muted-foreground line-clamp-4">
-                "En la edición de esta semana, exploramos cómo los últimos avances en aprendizaje automático están revolucionando industrias desde la medicina hasta la automoción.
-                Descubre herramientas innovadoras que pueden optimizar tus flujos de trabajo y cómo la IA generativa está abriendo nuevas fronteras creativas.
-                También analizamos las implicaciones éticas y los debates actuales en torno al desarrollo responsable de la IA. ¡No te pierdas nuestro análisis profundo y las entrevistas con expertos del sector!"
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground/80 pt-2">
-              (Este es un contenido de ejemplo. El contenido real generado en la pestaña "Newsletter" podría visualizarse aquí en una implementación futura.)
-            </p>
-          </CardContent>
-        </Card>
-
-      </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </PageContainer>
   );
 }
