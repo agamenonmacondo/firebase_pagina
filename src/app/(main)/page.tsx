@@ -1,37 +1,94 @@
 
 "use client";
 
-import { useState, useRef, useEffect, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { PageContainer } from "@/components/shared/page-container";
 import { AvaLogoIcon } from "@/components/AvaLogoIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SendHorizonal, User, Loader2, BotMessageSquare } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  SendHorizonal,
+  User,
+  Loader2,
+  BotMessageSquare,
+  MessageSquarePlus,
+  PanelLeftOpen,
+  Paperclip,
+  ImageUp,
+  Mic,
+  Trash2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
   type: "user" | "agent";
   text: string;
   timestamp: Date;
+  fileName?: string;
+  fileType?: "image" | "audio" | "other";
 }
 
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: Date;
+}
+
+const initialAgentMessageText = "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?";
+
 export default function HomePage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "initial-agent-message",
-      type: "agent",
-      text: "¡Hola! Soy AgenteAVA. ¿En qué puedo ayudarte hoy con tu newsletter?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const currentMessages = conversations.find(c => c.id === currentConversationId)?.messages || [];
+
+  const createNewConversation = useCallback(() => {
+    const newConversationId = crypto.randomUUID();
+    const newConversation: Conversation = {
+      id: newConversationId,
+      title: "Nueva Conversación",
+      messages: [
+        {
+          id: crypto.randomUUID(),
+          type: "agent",
+          text: initialAgentMessageText,
+          timestamp: new Date(),
+        },
+      ],
+      createdAt: new Date(),
+    };
+    setConversations((prev) => [newConversation, ...prev.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())]);
+    setCurrentConversationId(newConversationId);
+    inputRef.current?.focus();
+    setIsMobileSidebarOpen(false);
+    return newConversationId;
+  }, []);
+
+  useEffect(() => {
+    if (conversations.length === 0) {
+      createNewConversation();
+    } else if (!currentConversationId && conversations.length > 0) {
+      setCurrentConversationId(conversations[0].id);
+    }
+  }, [conversations, currentConversationId, createNewConversation]);
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -40,26 +97,53 @@ export default function HomePage() {
         behavior: "smooth",
       });
     }
-  }, [messages]);
+  }, [currentMessages]);
 
   useEffect(() => {
-    // Focus input on load
     inputRef.current?.focus();
-  }, []);
+  }, [currentConversationId]);
 
-  const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
+  const updateConversationMessages = (convId: string, newMessages: Message[], newTitle?: string) => {
+    setConversations(prevConvs =>
+      prevConvs.map(conv =>
+        conv.id === convId
+          ? { ...conv, messages: newMessages, title: newTitle || (newMessages.find(m => m.type === 'user')?.text.substring(0,30) + "...") || conv.title }
+          : conv
+      ).sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())
+    );
+  };
+
+  const addMessageToCurrentConversation = (message: Message) => {
+    if (!currentConversationId) return;
+    const currentConv = conversations.find(c => c.id === currentConversationId);
+    if (!currentConv) return;
+
+    const updatedMessages = [...currentConv.messages, message];
+    const newTitle = currentConv.messages.length === 1 && message.type === 'user' // Agent's first message is already there
+      ? message.text.substring(0, 30) + "..."
+      : currentConv.title;
+      
+    updateConversationMessages(currentConversationId, updatedMessages, newTitle);
+  };
+
+
+  const handleSubmitMessage = async (e?: FormEvent<HTMLFormElement>, text?: string, file?: {name: string, type: "image" | "audio" | "other"}) => {
+    if (e) e.preventDefault();
+    const messageText = text || inputValue.trim();
+    if ((!messageText && !file) || isLoading || !currentConversationId) return;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
       type: "user",
-      text: inputValue.trim(),
+      text: messageText,
       timestamp: new Date(),
+      fileName: file?.name,
+      fileType: file?.type,
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInputValue("");
+    addMessageToCurrentConversation(userMessage);
+
+    if (!text) setInputValue(""); // Clear input only if it was from the text input field
     setIsLoading(true);
 
     // Simulate agent response
@@ -67,106 +151,227 @@ export default function HomePage() {
       const agentResponse: Message = {
         id: crypto.randomUUID(),
         type: "agent",
-        text: "Estoy procesando tu solicitud... (Respuesta simulada)",
+        text: `He recibido tu ${file ? (file.type === 'image' ? 'imagen' : file.type === 'audio' ? 'audio' : 'archivo') : 'mensaje'}: "${messageText}${file ? ' ' + file.name : ''}". Estoy procesando... (Respuesta simulada)`,
         timestamp: new Date(),
       };
-      setMessages((prevMessages) => [...prevMessages, agentResponse]);
+      addMessageToCurrentConversation(agentResponse);
       setIsLoading(false);
-      // Re-focus input after agent responds
       inputRef.current?.focus();
     }, 1500);
   };
+  
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fileType: "image" | "audio" | "other") => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleSubmitMessage(undefined, `Archivo adjunto: ${file.name}`, { name: file.name, type: fileType });
+      toast({
+        title: "Archivo Seleccionado",
+        description: `${file.name} listo para enviar. Escribe un mensaje si quieres y presiona Enter o el botón de enviar.`,
+      });
+      // Reset file input value so the same file can be selected again
+      event.target.value = "";
+    }
+  };
+  
+  const handleDeleteConversation = (e: React.MouseEvent, convId: string) => {
+    e.stopPropagation(); // Prevent selecting the conversation when deleting
+    setConversations(prev => prev.filter(c => c.id !== convId));
+    if (currentConversationId === convId) {
+      setCurrentConversationId(conversations.length > 1 ? conversations.filter(c => c.id !== convId)[0]?.id : null);
+      if (conversations.length <= 1) { // if it was the last one
+         createNewConversation();
+      }
+    }
+    toast({
+      title: "Conversación Eliminada",
+      description: "La conversación ha sido eliminada.",
+    });
+  };
+
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full bg-muted/50">
+      <div className="p-4 border-b">
+        <Button onClick={createNewConversation} className="w-full">
+          <MessageSquarePlus className="mr-2 h-5 w-5" /> Nuevo Chat
+        </Button>
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-2">
+          {conversations.map((conv) => (
+            <Button
+              key={conv.id}
+              variant={currentConversationId === conv.id ? "secondary" : "ghost"}
+              className="w-full justify-between h-auto py-2"
+              onClick={() => {
+                setCurrentConversationId(conv.id);
+                setIsMobileSidebarOpen(false);
+              }}
+            >
+              <span className="truncate text-left flex-1 pr-2">{conv.title}</span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 shrink-0"
+                onClick={(e) => handleDeleteConversation(e, conv.id)}
+                aria-label="Eliminar conversación"
+              >
+                <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive" />
+              </Button>
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
+      <div className="p-4 border-t text-center">
+        <p className="text-xs text-muted-foreground">AgenteAVA v1.0</p>
+      </div>
+    </div>
+  );
 
   return (
-    <PageContainer className="flex flex-col min-h-[calc(100vh-4rem)] py-8">
-      <section className="text-center mb-12">
-        <div className="inline-block p-3 bg-primary/10 rounded-full mb-4 animate-slide-in-up">
-          <AvaLogoIcon width={48} height={48} className="text-primary" />
-        </div>
-        <h1 className="font-headline text-4xl md:text-5xl font-bold mb-3 animate-slide-in-up [animation-delay:0.1s]">
-          Chatea con AgenteAVA
-        </h1>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-in-up [animation-delay:0.2s]">
-          Tu asistente IA para la creación de newsletters y mucho más. Haz una pregunta o describe lo que necesitas.
-        </p>
-      </section>
-
-      <Card className="flex-1 flex flex-col shadow-2xl animate-slide-in-up [animation-delay:0.3s] max-w-3xl w-full mx-auto">
-        <CardContent className="flex-1 p-0">
-          <ScrollArea className="h-[calc(100vh-26rem)] sm:h-[calc(100vh-24rem)] md:h-[400px] lg:h-[500px] p-4 md:p-6" ref={scrollAreaRef}>
-            <div className="space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "flex items-end gap-3",
-                    message.type === "user" ? "justify-end" : "justify-start"
-                  )}
-                >
-                  {message.type === "agent" && (
-                    <Avatar className="h-8 w-8 border border-primary/20">
-                      <AvatarImage asChild src="/ava_logo.png" alt="AgenteAVA">
-                        {/* The AvaLogoIcon is an Image component, so we need to wrap it if used here or provide direct src */}
-                         <AvaLogoIcon width={32} height={32} />
-                      </AvatarImage>
-                      <AvatarFallback className="bg-primary/20">
-                        <BotMessageSquare className="h-5 w-5 text-primary" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div
-                    className={cn(
-                      "max-w-[70%] rounded-xl px-4 py-3 shadow",
-                      message.type === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-none"
-                        : "bg-muted text-foreground rounded-bl-none"
-                    )}
-                  >
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
-                    <p className={cn(
-                        "text-xs mt-1",
-                        message.type === "user" ? "text-primary-foreground/70 text-right" : "text-muted-foreground/70 text-left"
-                      )}>
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                  {message.type === "user" && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary">
-                        <User className="h-5 w-5 text-secondary-foreground" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-        <CardFooter className="p-4 md:p-6 border-t">
-          <form
-            onSubmit={handleSubmitMessage}
-            className="flex w-full items-center gap-3"
-          >
-            <Input
-              ref={inputRef}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Escribe tu mensaje a AgenteAVA..."
-              className="flex-1 h-11 text-base"
-              disabled={isLoading}
-              autoComplete="off"
-            />
-            <Button type="submit" size="lg" className="h-11" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <SendHorizonal className="h-5 w-5" />
-              )}
-              <span className="sr-only">Enviar</span>
+    <PageContainer className="flex flex-col min-h-[calc(100vh-4rem)] p-0 md:flex-row">
+      {/* Mobile Sidebar Trigger & Sheet */}
+      <div className="md:hidden p-2 border-b">
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon">
+              <PanelLeftOpen className="h-5 w-5" />
             </Button>
-          </form>
-        </CardFooter>
-      </Card>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-80">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block md:w-80 lg:w-96 border-r">
+        <SidebarContent />
+      </aside>
+
+      {/* Main Chat Area */}
+      <main className="flex-1 flex flex-col bg-background">
+        <Card className="flex-1 flex flex-col shadow-none border-0 rounded-none max-w-full w-full mx-auto">
+          {currentConversationId && conversations.find(c=>c.id === currentConversationId) ? (
+            <>
+              <CardHeader className="border-b md:hidden">
+                 <CardTitle className="font-headline text-xl truncate">
+                    {conversations.find(c=>c.id === currentConversationId)?.title || "Chat"}
+                 </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 p-0">
+                <ScrollArea className="h-[calc(100vh-18rem)] sm:h-[calc(100vh-16rem)] md:h-[calc(100vh-12rem)] p-4 md:p-6" ref={scrollAreaRef}>
+                  <div className="space-y-6">
+                    {currentMessages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          "flex items-end gap-3",
+                          message.type === "user" ? "justify-end" : "justify-start"
+                        )}
+                      >
+                        {message.type === "agent" && (
+                          <Avatar className="h-8 w-8 border border-primary/20">
+                            <AvatarImage asChild src="/ava_logo.png" alt="AgenteAVA">
+                              <AvaLogoIcon width={32} height={32} />
+                            </AvatarImage>
+                            <AvatarFallback className="bg-primary/20">
+                              <BotMessageSquare className="h-5 w-5 text-primary" />
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                        <div
+                          className={cn(
+                            "max-w-[70%] rounded-xl px-4 py-3 shadow",
+                            message.type === "user"
+                              ? "bg-primary text-primary-foreground rounded-br-none"
+                              : "bg-muted text-foreground rounded-bl-none"
+                          )}
+                        >
+                          {message.fileName && (
+                             <div className="mb-1 p-2 border border-dashed rounded-md bg-black/10 dark:bg-white/10">
+                                <p className="text-xs font-medium flex items-center">
+                                {message.fileType === 'image' ? <ImageUp className="h-4 w-4 mr-2 shrink-0" /> : message.fileType === 'audio' ? <Mic className="h-4 w-4 mr-2 shrink-0" /> : <Paperclip className="h-4 w-4 mr-2 shrink-0" />}
+                                {message.fileName}
+                                </p>
+                            </div>
+                          )}
+                          <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
+                          <p className={cn(
+                              "text-xs mt-1",
+                              message.type === "user" ? "text-primary-foreground/70 text-right" : "text-muted-foreground/70 text-left"
+                            )}>
+                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                        {message.type === "user" && (
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-secondary">
+                              <User className="h-5 w-5 text-secondary-foreground" />
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+              <CardFooter className="p-2 md:p-3 border-t">
+                <form
+                  onSubmit={handleSubmitMessage}
+                  className="flex w-full items-center gap-2"
+                >
+                  <div className="flex gap-1">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => imageInputRef.current?.click()} disabled={isLoading} aria-label="Adjuntar imagen">
+                      <ImageUp className="h-5 w-5" />
+                    </Button>
+                    <input type="file" ref={imageInputRef} accept="image/*" onChange={(e) => handleFileUpload(e, "image")} className="hidden" />
+                    
+                    <Button type="button" variant="ghost" size="icon" onClick={() => audioInputRef.current?.click()} disabled={isLoading} aria-label="Adjuntar audio">
+                      <Mic className="h-5 w-5" />
+                    </Button>
+                    <input type="file" ref={audioInputRef} accept="audio/*" onChange={(e) => handleFileUpload(e, "audio")} className="hidden" />
+
+                    <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isLoading} aria-label="Adjuntar archivo">
+                      <Paperclip className="h-5 w-5" />
+                    </Button>
+                    <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, "other")} className="hidden" />
+                  </div>
+                  <Input
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Escribe tu mensaje a AgenteAVA..."
+                    className="flex-1 h-10 text-base"
+                    disabled={isLoading}
+                    autoComplete="off"
+                  />
+                  <Button type="submit" size="icon" className="h-10 w-10" disabled={isLoading || (!inputValue.trim() && currentMessages.findLast(m=>m.type==='user')?.fileName === undefined)}>
+                    {isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <SendHorizonal className="h-5 w-5" />
+                    )}
+                    <span className="sr-only">Enviar</span>
+                  </Button>
+                </form>
+              </CardFooter>
+            </>
+          ) : (
+            <CardContent className="flex-1 flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                <BotMessageSquare className="h-16 w-16 mx-auto mb-4" />
+                <p className="text-lg">Selecciona una conversación o inicia una nueva.</p>
+                <Button onClick={createNewConversation} className="mt-4">
+                  <MessageSquarePlus className="mr-2 h-5 w-5" /> Iniciar Nuevo Chat
+                </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      </main>
     </PageContainer>
   );
 }
+
+    
