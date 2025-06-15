@@ -13,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  MessageCircle,
   SendHorizonal,
   User,
   Loader2,
@@ -22,7 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { usePathname } from "next/navigation"; // Added import
+import { usePathname } from "next/navigation";
 
 interface WidgetMessage {
   id: string;
@@ -32,7 +31,7 @@ interface WidgetMessage {
 }
 
 export function GlobalChatWidget() {
-  const pathname = usePathname(); // Get current pathname
+  const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<WidgetMessage[]>([]);
@@ -100,7 +99,6 @@ export function GlobalChatWidget() {
     }, 1500);
   };
 
-  // Hide widget if on the main chat page ('/')
   if (pathname === '/') {
     return null;
   }
@@ -110,22 +108,24 @@ export function GlobalChatWidget() {
       <PopoverTrigger asChild>
         <Button
           variant="default"
-          size="icon"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 bg-primary hover:bg-primary/90"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50 p-0 overflow-hidden border-2 border-background dark:border-primary/50 focus:ring-2 focus:ring-ring focus:ring-offset-2"
           aria-label="Abrir chat de AgenteAVA"
         >
-          {isOpen ? (
-            <X className="h-7 w-7 text-primary-foreground" />
-          ) : (
-            <MessageCircle className="h-7 w-7 text-primary-foreground" />
-          )}
+          <Image 
+            src="/images/ava_hero.png" 
+            alt="AgenteAVA chat" 
+            width={64}
+            height={64}
+            className="object-cover h-full w-full"
+            data-ai-hint="female avatar"
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         side="top"
         align="end"
         className="w-80 md:w-96 h-[500px] p-0 flex flex-col shadow-2xl rounded-lg border-border bg-card"
-        onOpenAutoFocus={(e) => e.preventDefault()} // Prevents Popover from stealing focus initially
+        onOpenAutoFocus={(e) => e.preventDefault()} 
       >
         <header className="flex items-center justify-between p-4 border-b bg-muted/50 rounded-t-lg">
           <div className="flex items-center gap-2">
