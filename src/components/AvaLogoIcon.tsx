@@ -1,24 +1,22 @@
-import type { LucideProps } from 'lucide-react';
+import Image from 'next/image';
+import type { ImageProps as NextImageProps } from 'next/image';
 
-export function AvaLogoIcon(props: LucideProps) {
+interface AvaLogoIconProps extends Omit<NextImageProps, 'src' | 'alt'> {
+  // width and height will be passed directly to NextImageProps
+  // but we default them here for the specific logo.
+  // className is part of NextImageProps
+}
+
+export function AvaLogoIcon({ width = 75, height = 24, className, ...props }: AvaLogoIconProps) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 75 24" // Adjusted viewBox slightly for "AVA" text
-      fill="currentColor"
-      {...props} // Spread props to allow overriding size, className, etc.
-    >
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontFamily="Space Grotesk, sans-serif" // Using the project's headline font
-        fontSize="22" // Adjusted font size to fit well
-        fontWeight="bold"
-      >
-        AVA
-      </text>
-    </svg>
+    <Image
+      src="/images/ava-logo.png" // User must create public/images/ava-logo.png
+      alt="AgenteAVA Logo"
+      width={width} // Intrinsic width for aspect ratio, can be overridden via props
+      height={height} // Intrinsic height for aspect ratio, can be overridden via props
+      className={className} // Applied to the Next.js Image component for display sizing
+      data-ai-hint="AVA logo"
+      {...props} // Spread other valid NextImageProps
+    />
   );
 }
