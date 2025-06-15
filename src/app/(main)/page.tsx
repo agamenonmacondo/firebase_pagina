@@ -22,6 +22,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
   SendHorizonal,
   User,
   Loader2,
@@ -286,42 +292,51 @@ export default function HomePage() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-2">
-          {conversations.map((conv) => (
-            <div
-              key={conv.id}
-              className={cn(
-                buttonVariants({ variant: currentConversationId === conv.id ? "secondary" : "ghost" }),
-                "w-full justify-between h-auto py-2 cursor-pointer flex items-center"
-              )}
-              onClick={() => {
-                setCurrentConversationId(conv.id);
-                setIsMobileSidebarOpen(false);
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  setCurrentConversationId(conv.id);
-                  setIsMobileSidebarOpen(false);
-                }
-              }}
-            >
-              <span className="truncate text-left flex-1 pr-2">{conv.title}</span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-7 w-7 shrink-0"
-                onClick={(e) => handleDeleteConversation(e, conv.id)}
-                aria-label="Eliminar conversación"
-              >
-                <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+      <Accordion type="single" collapsible defaultValue="conversations" className="flex-1 overflow-y-auto">
+        <AccordionItem value="conversations" className="border-b-0">
+          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline justify-start [&[data-state=open]>svg]:ml-auto">
+            Historial de Chats
+          </AccordionTrigger>
+          <AccordionContent>
+            <ScrollArea className="h-full max-h-[calc(100vh-18rem)]"> {/* Adjust max-height as needed */}
+              <div className="px-4 pb-4 space-y-2">
+                {conversations.map((conv) => (
+                  <div
+                    key={conv.id}
+                    className={cn(
+                      buttonVariants({ variant: currentConversationId === conv.id ? "secondary" : "ghost" }),
+                      "w-full justify-between h-auto py-2 cursor-pointer flex items-center"
+                    )}
+                    onClick={() => {
+                      setCurrentConversationId(conv.id);
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setCurrentConversationId(conv.id);
+                        setIsMobileSidebarOpen(false);
+                      }
+                    }}
+                  >
+                    <span className="truncate text-left flex-1 pr-2">{conv.title}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 shrink-0"
+                      onClick={(e) => handleDeleteConversation(e, conv.id)}
+                      aria-label="Eliminar conversación"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <div className="p-4 border-t text-center">
         <p className="text-xs text-muted-foreground">AgenteAVA v1.0</p>
       </div>
@@ -514,4 +529,5 @@ export default function HomePage() {
     
 
     
+
 
