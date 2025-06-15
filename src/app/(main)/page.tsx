@@ -19,7 +19,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   Accordion,
@@ -34,6 +33,7 @@ import {
   BotMessageSquare,
   MessageSquarePlus,
   PanelLeftOpen,
+  PanelLeftClose, // Added for desktop sidebar toggle
   Paperclip,
   ImageUp,
   Mic,
@@ -47,12 +47,10 @@ interface Message {
   type: "user" | "agent";
   text: string;
   timestamp: Date;
-  // User uploaded file/image
   fileName?: string;
   fileType?: "image" | "audio" | "other";
   userImageUrl?: string; 
   userImageAlt?: string;
-  // Agent sent image
   agentImageUrl?: string;
   agentImageAlt?: string;
 }
@@ -70,6 +68,7 @@ export default function HomePage() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true); // State for desktop sidebar
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +97,7 @@ export default function HomePage() {
     setConversations((prev) => [newConversation, ...prev.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())]);
     setCurrentConversationId(newConversationId);
     inputRef.current?.focus();
-    setIsMobileSidebarOpen(false);
+    setIsMobileSidebarOpen(false); // Close mobile sidebar on new chat
     return newConversationId;
   }, []);
 
@@ -268,6 +267,9 @@ export default function HomePage() {
     });
   };
 
+  const toggleDesktopSidebar = () => {
+    setIsDesktopSidebarOpen(prev => !prev);
+  };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-muted/50">
@@ -298,7 +300,7 @@ export default function HomePage() {
             Historial de Chats
           </AccordionTrigger>
           <AccordionContent>
-            <ScrollArea className="h-full max-h-[calc(100vh-18rem)]"> {/* Adjust max-height as needed */}
+            <ScrollArea className="h-full max-h-[calc(100vh-18rem)]">
               <div className="px-4 pb-4 space-y-2">
                 {conversations.map((conv) => (
                   <div
@@ -345,22 +347,35 @@ export default function HomePage() {
 
   return (
     <PageContainer className="flex flex-col min-h-[calc(100vh-4rem)] p-0 md:flex-row">
-      <div className="md:hidden p-2 border-b">
-        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon">
-              <PanelLeftOpen className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-80">
-            <SidebarContent />
-          </SheetContent>
-        </Sheet>
+      {/* Sidebar Toggles Container */}
+      <div className="p-2 border-b md:border-b-0 md:border-r">
+        {/* Mobile Sidebar Toggle */}
+        <div className="md:hidden">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="Abrir barra lateral móvil">
+                <PanelLeftOpen className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-80">
+              <SidebarContent />
+            </SheetContent>
+          </Sheet>
+        </div>
+        {/* Desktop Sidebar Toggle */}
+        <div className="hidden md:block">
+          <Button variant="outline" size="icon" onClick={toggleDesktopSidebar} aria-label={isDesktopSidebarOpen ? "Cerrar barra lateral" : "Abrir barra lateral"}>
+            {isDesktopSidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
-      <aside className="hidden md:block md:w-80 lg:w-96 border-r">
-        <SidebarContent />
-      </aside>
+      {/* Desktop Sidebar */}
+      {isDesktopSidebarOpen && (
+        <aside className="hidden md:block md:w-80 lg:w-96 border-r">
+          <SidebarContent />
+        </aside>
+      )}
 
       <main className="flex-1 flex flex-col bg-background">
         <Card className="flex-1 flex flex-col shadow-none border-0 rounded-none max-w-full w-full mx-auto">
@@ -529,5 +544,6 @@ export default function HomePage() {
     
 
     
+
 
 
