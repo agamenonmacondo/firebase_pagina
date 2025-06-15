@@ -49,18 +49,18 @@ export function LoginForm() {
     // Mock login logic:
     // In a real app, you'd call an API endpoint here.
     // For this showcase, we'll use a hardcoded user for demonstration.
-    if (values.email === "user@example.com" && values.password === "password") {
-      login(values.email, "Demo User"); // Logs in with email and a default name
+    if (values.email === "agamenonmacondo@gmail.com" && values.password === "password") {
+      login(values.email, "Agamenón Macondo"); // Logs in with the new email and a name
       toast({
         title: "Login Successful",
-        description: "Welcome back, Demo User!",
+        description: "Welcome back, Agamenón Macondo!",
       });
       router.push("/dashboard"); // Redirect to dashboard
     } else {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid email or password. Try user@example.com and password.",
+        description: "Invalid email or password. Try agamenonmacondo@gmail.com and password.",
       });
     }
     setIsLoading(false);
@@ -103,3 +103,4 @@ export function LoginForm() {
     </Form>
   );
 }
+
