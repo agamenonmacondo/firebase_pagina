@@ -101,7 +101,7 @@ export function GlobalChatWidget() {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="primary"
+          variant="default" // Changed from "primary" to "default"
           size="icon"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 bg-primary hover:bg-primary/90"
           aria-label="Abrir chat de AgenteAVA"
@@ -122,7 +122,7 @@ export function GlobalChatWidget() {
         <header className="flex items-center justify-between p-4 border-b bg-muted/50 rounded-t-lg">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" />
+              <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" data-ai-hint="female avatar" />
               <AvatarFallback className="bg-primary/20">
                 <BotMessageSquare className="h-5 w-5 text-primary" />
               </AvatarFallback>
@@ -147,7 +147,7 @@ export function GlobalChatWidget() {
               >
                 {message.type === "agent" && (
                   <Avatar className="h-7 w-7 border border-primary/20 shrink-0">
-                    <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" />
+                    <AvatarImage src="/images/ava_hero.png" alt="AgenteAVA" data-ai-hint="female avatar" />
                     <AvatarFallback className="bg-primary/20">
                       <BotMessageSquare className="h-4 w-4 text-primary" />
                     </AvatarFallback>
@@ -207,3 +207,4 @@ export function GlobalChatWidget() {
     </Popover>
   );
 }
+
