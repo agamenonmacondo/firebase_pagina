@@ -13,7 +13,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl animate-slide-in-up">
         <CardHeader className="text-center space-y-2">
           <AvaLogoIcon className="h-12 w-12 mx-auto text-primary" />
-          <CardTitle className="font-headline text-3xl">Bienvenido de Nuevo</CardTitle>
+          <CardTitle className="font-headline text-3xl">Welcome Back</CardTitle>
           <CardDescription>Inicia sesión con tu correo electrónico, Google o teléfono para acceder a las herramientas de newsletter IA de AgenteAVA.</CardDescription>
         </CardHeader>
         <CardContent>
