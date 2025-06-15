@@ -186,7 +186,7 @@ export function LoginForm() {
           {isGoogleLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
               <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.8 0 265.5S110.3 19 244 19c71.1 0 126.6 27.8 172.9 69.8l-69.2 67.3C317.7 131 284.4 115.8 244 115.8c-59.9 0-109.4 49.6-109.4 110.2s49.5 110.2 109.4 110.2c68.5 0 96.5-48.9 99.6-73.7H244v-83.8h235.9c2.3 12.7 3.7 26.6 3.7 42.7z"></path>
             </svg>
           )}
