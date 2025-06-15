@@ -11,6 +11,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   SendHorizonal,
   User,
   Loader2,
@@ -255,9 +266,25 @@ export default function HomePage() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-muted/50">
       <div className="p-4 border-b">
-        <Button onClick={createNewConversation} className="w-full">
-          <MessageSquarePlus className="mr-2 h-5 w-5" /> Nuevo Chat
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="w-full">
+              <MessageSquarePlus className="mr-2 h-5 w-5" /> Nuevo Chat
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Iniciar Nueva Conversación?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esto creará una nueva sesión de chat. ¿Estás seguro?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={createNewConversation}>Crear</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
@@ -456,9 +483,25 @@ export default function HomePage() {
               <div className="text-center text-muted-foreground">
                 <BotMessageSquare className="h-16 w-16 mx-auto mb-4" />
                 <p className="text-lg">Selecciona una conversación o inicia una nueva.</p>
-                <Button onClick={createNewConversation} className="mt-4">
-                  <MessageSquarePlus className="mr-2 h-5 w-5" /> Iniciar Nuevo Chat
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="mt-4">
+                      <MessageSquarePlus className="mr-2 h-5 w-5" /> Iniciar Nuevo Chat
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Iniciar Nueva Conversación?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esto creará una nueva sesión de chat. ¿Estás seguro?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={createNewConversation}>Crear</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           )}
@@ -471,3 +514,4 @@ export default function HomePage() {
     
 
     
+
