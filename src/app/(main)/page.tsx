@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { PageContainer } from "@/components/shared/page-container";
-import { Button, buttonVariants } from "@/components/ui/button"; // Imported buttonVariants
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -126,7 +126,6 @@ export default function HomePage() {
     updateConversationMessages(currentConversationId, updatedMessages, newTitle);
   };
 
-
   const handleSubmitMessage = async (e?: FormEvent<HTMLFormElement>, text?: string, file?: {name: string, type: "image" | "audio" | "other", dataUrl?: string }) => {
     if (e) e.preventDefault();
     const messageText = text || inputValue.trim();
@@ -148,45 +147,93 @@ export default function HomePage() {
     if (!text) setInputValue(""); 
     setIsLoading(true);
 
-    setTimeout(() => {
-      const agentResponse: Message = {
+    try {
+      // **PUNTO DE INTEGRACIÓN CON EL BACKEND DE LANGGRAPH**
+      // Aquí es donde llamarías a tu endpoint de API que interactúa con LangGraph.
+      // Este es un ejemplo, necesitarás crear este endpoint en tu backend.
+      // El endpoint '/api/chat' debería ser una API Route en tu proyecto Next.js.
+      const payload: any = {
+        message: messageText,
+        conversationId: currentConversationId,
+        // Podrías enviar también el historial de mensajes si tu agente lo necesita:
+        // history: currentMessages.filter(msg => msg.id !== userMessage.id), // Excluye el mensaje actual del usuario
+      };
+
+      if (file && file.dataUrl) {
+        payload.fileData = file.dataUrl; // Base64 string
+        payload.fileName = file.name;
+        payload.fileType = file.type;
+      }
+
+      const response = await fetch('/api/chat', { // Reemplaza '/api/chat' con tu endpoint real
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // Intenta obtener un mensaje de error del cuerpo de la respuesta si es JSON
+        let errorResponseMessage = `Error HTTP: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorResponseMessage = errorData.message || errorData.error || errorResponseMessage;
+        } catch (jsonError) {
+          // Si el cuerpo no es JSON o está vacío, usa el mensaje de estado HTTP
+        }
+        throw new Error(errorResponseMessage);
+      }
+
+      const agentResponseData = await response.json();
+
+      // Asume que tu API devuelve un objeto con una propiedad 'responseText' o similar
+      const agentMessage: Message = {
         id: crypto.randomUUID(),
         type: "agent",
-        text: `He recibido tu ${file ? (file.type === 'image' ? 'imagen' : file.type === 'audio' ? 'audio' : 'archivo') : 'mensaje'}: "${messageText}${file ? ' ' + file.name : ''}". Estoy procesando... (Respuesta simulada)`,
+        text: agentResponseData.responseText || "No se recibió una respuesta válida del agente.",
         timestamp: new Date(),
       };
-      addMessageToCurrentConversation(agentResponse);
+      addMessageToCurrentConversation(agentMessage);
+
+    } catch (error) {
+      console.error("Error al contactar al agente:", error);
+      const errorMessageText = error instanceof Error ? `Error: ${error.message}` : "Hubo un problema al conectar con el agente.";
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        type: "agent",
+        text: errorMessageText,
+        timestamp: new Date(),
+      };
+      addMessageToCurrentConversation(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Error de Conexión",
+        description: errorMessageText,
+      });
+    } finally {
       setIsLoading(false);
       inputRef.current?.focus();
-    }, 1500);
+    }
   };
   
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fileType: "image" | "audio" | "other") => {
     const file = event.target.files?.[0];
     if (file) {
-      if (fileType === "image" && file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (loadEvent) => {
-          const imageUrl = loadEvent.target?.result as string;
-          // Add message with image preview for user
-          // For image uploads, we can directly use handleSubmitMessage to show the image and simulate processing
-          handleSubmitMessage(undefined, inputValue.trim() || `Imagen adjunta: ${file.name}`, { name: file.name, type: "image", dataUrl: imageUrl });
-          setInputValue(""); // Clear input after processing
-          toast({
-            title: "Imagen Adjuntada",
-            description: `${file.name} se ha adjuntado y se mostrará.`,
-          });
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // For non-image files, just announce the attachment.
-        handleSubmitMessage(undefined, inputValue.trim() || `Adjuntado: ${file.name}`, { name: file.name, type: fileType });
-        setInputValue("");
+      const reader = new FileReader();
+      reader.onload = (loadEvent) => {
+        const dataUrl = loadEvent.target?.result as string;
+        
+        // Para este ejemplo, enviaremos el archivo junto con cualquier texto en el input
+        // Podrías optar por enviar el archivo inmediatamente o permitir que el usuario añada texto primero.
+        handleSubmitMessage(undefined, inputValue.trim() || `Archivo adjunto: ${file.name}`, { name: file.name, type: fileType, dataUrl: dataUrl });
+        setInputValue(""); 
         toast({
-          title: "Archivo Adjuntado",
-          description: `${file.name} listo.`,
+          title: fileType === "image" ? "Imagen Adjuntada" : "Archivo Adjuntado",
+          description: `${file.name} procesándose.`,
         });
-      }
+      };
+      reader.readAsDataURL(file); 
       event.target.value = ""; 
     }
   };
@@ -413,4 +460,6 @@ export default function HomePage() {
   );
 }
     
+    
+
     
