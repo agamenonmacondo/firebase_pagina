@@ -162,7 +162,7 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-          <Link href="#" className="text-sm font-medium text-primary hover:underline">
+          <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
             Forgot password?
           </Link>
         </div>
