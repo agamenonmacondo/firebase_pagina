@@ -11,10 +11,10 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  { label: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, authRequired: true, isDashboard: true },
   { label: 'AVA Assistant', href: '/', icon: Home },
   { label: 'AVA News', href: '/project', icon: LayoutList },
-  { label: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { label: 'Newsletter', href: '/newsletter', icon: Newspaper, authRequired: true },
   { label: 'Login', href: '/login', icon: LogIn, hideWhenAuthed: true },
 ];
