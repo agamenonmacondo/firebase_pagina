@@ -30,10 +30,14 @@ interface Message {
   type: "user" | "agent";
   text: string;
   timestamp: Date;
+  // User uploaded file/image
   fileName?: string;
   fileType?: "image" | "audio" | "other";
-  imageUrl?: string; 
-  imageAlt?: string;
+  userImageUrl?: string; 
+  userImageAlt?: string;
+  // Agent sent image
+  agentImageUrl?: string;
+  agentImageAlt?: string;
 }
 
 interface Conversation {
@@ -85,7 +89,7 @@ export default function HomePage() {
     if (conversations.length === 0) {
       createNewConversation();
     } else if (!currentConversationId && conversations.length > 0) {
-      setCurrentConversationId(conversations[0].id);
+      setCurrentConversationId(conversations.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())[0].id);
     }
   }, [conversations, currentConversationId, createNewConversation]);
 
@@ -138,8 +142,8 @@ export default function HomePage() {
       timestamp: new Date(),
       fileName: file?.name,
       fileType: file?.type,
-      imageUrl: file?.type === 'image' ? file.dataUrl : undefined,
-      imageAlt: file?.type === 'image' ? file.name : undefined,
+      userImageUrl: file?.type === 'image' ? file.dataUrl : undefined,
+      userImageAlt: file?.type === 'image' ? file.name : undefined,
     };
 
     addMessageToCurrentConversation(userMessage);
@@ -148,24 +152,18 @@ export default function HomePage() {
     setIsLoading(true);
 
     try {
-      // **PUNTO DE INTEGRACIÓN CON EL BACKEND DE LANGGRAPH**
-      // Aquí es donde llamarías a tu endpoint de API que interactúa con LangGraph.
-      // Este es un ejemplo, necesitarás crear este endpoint en tu backend.
-      // El endpoint '/api/chat' debería ser una API Route en tu proyecto Next.js.
       const payload: any = {
         message: messageText,
         conversationId: currentConversationId,
-        // Podrías enviar también el historial de mensajes si tu agente lo necesita:
-        // history: currentMessages.filter(msg => msg.id !== userMessage.id), // Excluye el mensaje actual del usuario
       };
 
       if (file && file.dataUrl) {
-        payload.fileData = file.dataUrl; // Base64 string
+        payload.fileData = file.dataUrl; 
         payload.fileName = file.name;
-        payload.fileType = file.type;
+        payload.fileMimeType = file.dataUrl.substring(file.dataUrl.indexOf(':') + 1, file.dataUrl.indexOf(';'));
       }
 
-      const response = await fetch('/api/chat', { // Reemplaza '/api/chat' con tu endpoint real
+      const response = await fetch('/api/chat', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,25 +172,25 @@ export default function HomePage() {
       });
 
       if (!response.ok) {
-        // Intenta obtener un mensaje de error del cuerpo de la respuesta si es JSON
         let errorResponseMessage = `Error HTTP: ${response.status}`;
         try {
           const errorData = await response.json();
           errorResponseMessage = errorData.message || errorData.error || errorResponseMessage;
         } catch (jsonError) {
-          // Si el cuerpo no es JSON o está vacío, usa el mensaje de estado HTTP
+          // If body is not JSON or empty
         }
         throw new Error(errorResponseMessage);
       }
 
       const agentResponseData = await response.json();
 
-      // Asume que tu API devuelve un objeto con una propiedad 'responseText' o similar
       const agentMessage: Message = {
         id: crypto.randomUUID(),
         type: "agent",
         text: agentResponseData.responseText || "No se recibió una respuesta válida del agente.",
         timestamp: new Date(),
+        agentImageUrl: agentResponseData.imageUrl,
+        agentImageAlt: agentResponseData.imageAlt || "Imagen del Agente",
       };
       addMessageToCurrentConversation(agentMessage);
 
@@ -224,8 +222,6 @@ export default function HomePage() {
       reader.onload = (loadEvent) => {
         const dataUrl = loadEvent.target?.result as string;
         
-        // Para este ejemplo, enviaremos el archivo junto con cualquier texto en el input
-        // Podrías optar por enviar el archivo inmediatamente o permitir que el usuario añada texto primero.
         handleSubmitMessage(undefined, inputValue.trim() || `Archivo adjunto: ${file.name}`, { name: file.name, type: fileType, dataUrl: dataUrl });
         setInputValue(""); 
         toast({
@@ -360,11 +356,11 @@ export default function HomePage() {
                               : "bg-muted text-foreground rounded-bl-none"
                           )}
                         >
-                          {message.imageUrl && message.type === 'user' && ( 
+                          {message.userImageUrl && message.type === 'user' && ( 
                             <div className="mb-2">
                               <Image
-                                src={message.imageUrl} 
-                                alt={message.imageAlt || "Chat image"}
+                                src={message.userImageUrl} 
+                                alt={message.userImageAlt || "Imagen del usuario"}
                                 width={300} 
                                 height={200} 
                                 className="rounded-md object-cover"
@@ -383,6 +379,18 @@ export default function HomePage() {
                           {message.text && (
                             <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
                           )}
+                          {message.type === "agent" && message.agentImageUrl && (
+                            <div className="mt-2">
+                              <Image
+                                src={message.agentImageUrl}
+                                alt={message.agentImageAlt || "Imagen del Agente"}
+                                width={300} 
+                                height={200} 
+                                className="rounded-md object-cover"
+                                data-ai-hint="agent response image"
+                              />
+                            </div>
+                           )}
                           <p className={cn(
                               "text-xs mt-1",
                               message.type === "user" ? "text-primary-foreground/70 text-right" : "text-muted-foreground/70 text-left"
