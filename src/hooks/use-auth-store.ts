@@ -9,6 +9,8 @@ interface AuthState {
   logout: () => void;
 }
 
+// This mock auth store would be adapted to integrate with Firebase Authentication
+// by listening to onAuthStateChanged and updating state accordingly.
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
