@@ -3,14 +3,15 @@ import { PageContainer } from "@/components/shared/page-container";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, Brain, Lightbulb, Zap } from "lucide-react";
+import { AvaLogoIcon } from "@/components/AvaLogoIcon"; // Changed import
+import { Brain, Lightbulb, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
     <PageContainer>
       <section className="text-center py-16 md:py-24">
         <div className="inline-block p-4 bg-primary/10 rounded-full mb-6 animate-slide-in-up [animation-delay:0.1s]">
-          <Bot className="h-12 w-12 text-primary" />
+          <AvaLogoIcon className="h-12 w-12 text-primary" /> {/* Changed component */}
         </div>
         <h1 className="font-headline text-4xl md:text-6xl font-bold mb-6 animate-slide-in-up [animation-delay:0.2s]">
           Welcome to AgenteAVA Showcase

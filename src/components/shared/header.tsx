@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { BotIcon, LogOut } from 'lucide-react';
+import { AvaLogoIcon } from '@/components/AvaLogoIcon'; // Changed import
+import { LogOut } from 'lucide-react';
 import { NAV_ITEMS, type NavItem } from '@/lib/constants';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { ThemeToggle } from './theme-toggle';
@@ -29,7 +30,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
-          <BotIcon className="h-6 w-6 text-primary" />
+          <AvaLogoIcon className="h-6 w-6 text-primary" /> {/* Changed component */}
           <span className="font-bold font-headline sm:inline-block text-lg">
             AgenteAVA
           </span>
