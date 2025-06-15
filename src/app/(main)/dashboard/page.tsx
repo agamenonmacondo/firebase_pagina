@@ -129,7 +129,7 @@ export default function DashboardPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10 animate-slide-in-up [animation-delay:0.2s]">
-        {dashboardCards.slice(0,1).map((card, index) => ( // Main stat card (full width on medium)
+        {dashboardCards.slice(0,1).map((card, index) => ( 
             <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-1 ${card.bgColor} border ${card.borderColor}`}>
                  <CardHeader>
                     <div className="flex items-center mb-1">
@@ -144,7 +144,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         ))}
-         {dashboardCards.slice(1,2).map((card, index) => ( // Main stat card (full width on medium)
+         {dashboardCards.slice(1,2).map((card, index) => ( 
             <Card key={card.title} className={`shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-2 ${card.bgColor} border ${card.borderColor}`}>
                  <CardHeader>
                     <div className="flex items-center mb-1">
@@ -179,3 +179,5 @@ export default function DashboardPage() {
     </PageContainer>
   );
 }
+
+    
