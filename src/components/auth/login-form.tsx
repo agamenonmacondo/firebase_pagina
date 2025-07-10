@@ -62,7 +62,7 @@ export function LoginForm() {
         title: "Inicio de Sesión Exitoso",
         description: "¡Bienvenido de nuevo, Agamenón Macondo!",
       });
-      router.push("/dashboard"); 
+      router.push("/"); 
     } else {
       toast({
         variant: "destructive",
@@ -86,7 +86,7 @@ export function LoginForm() {
         title: "Inicio de Sesión con Google Exitoso",
         description: `¡Bienvenido, ${firebaseUser.displayName || "Usuario"}!`,
       });
-      router.push("/dashboard");
+      router.push("/");
 
     } catch (error: any) {
       console.error("Error durante el inicio de sesión con Google:", error);
