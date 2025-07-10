@@ -1,10 +1,11 @@
 
+"use client";
+
 import { PageContainer } from "@/components/shared/page-container";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BotMessageSquare, CheckCircle, Newspaper } from "lucide-react";
-import React from "react";
+import { ArrowRight, Volume2, VolumeX } from "lucide-react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvaLogoIcon } from "@/components/AvaLogoIcon";
 
 const Overlay = ({ children }: { children: React.ReactNode }) => (
@@ -14,10 +15,21 @@ const Overlay = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function PortfolioPage() {
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
         {/* Background Video */}
         <video
+            ref={videoRef}
             autoPlay
             loop
             muted
@@ -27,6 +39,19 @@ export default function PortfolioPage() {
             <source src="/video/video_ava.mp4" type="video/mp4" />
             Your browser does not support the video tag.
         </video>
+
+        {/* Mute/Unmute Button */}
+        <div className="absolute bottom-6 right-6 z-20">
+          <Button
+            onClick={toggleMute}
+            variant="outline"
+            size="icon"
+            className="bg-black/30 hover:bg-black/50 text-white border-white/50 hover:text-white"
+            aria-label={isMuted ? "Activar sonido" : "Silenciar"}
+          >
+            {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          </Button>
+        </div>
 
         {/* Content with Overlay */}
         <Overlay>
