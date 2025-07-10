@@ -247,42 +247,6 @@ export default function AvaNewsPage() {
           </Dialog>
         ))}
       </div>
-      
-      <section className="mt-16 animate-slide-in-up" style={{animationDelay: `${0.2 + mockNewsData.length * 0.1 + 0.2}s`}}>
-        <header className="mb-8 text-center">
-          <h2 className="font-headline text-3xl md:text-4xl font-bold mb-3">Contenido Destacado por IA</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Un vistazo a los análisis y creaciones recientes de AgenteAVA.
-          </p>
-        </header>
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader>
-            <div className="flex items-center mb-2">
-              <Newspaper className="h-8 w-8 text-primary mr-3" />
-              <CardTitle className="font-headline text-2xl">Análisis Profundo: Tendencias de IA en Marketing</CardTitle>
-            </div>
-            <CardDescription>
-              Generado por AgenteAVA - Basado en los últimos datos y análisis de la industria.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground leading-relaxed">
-              AgenteAVA ha procesado miles de artículos, estudios de caso y discusiones de expertos para identificar las tendencias emergentes en la aplicación de la inteligencia artificial al marketing digital. Este informe destaca cómo la personalización a gran escala, la creación de contenido automatizado y el análisis predictivo de comportamiento del consumidor están redefiniendo las estrategias de las marcas. Se exploran también los desafíos éticos y las oportunidades para las empresas que adopten estas tecnologías de manera proactiva.
-              <br /><br />
-              <strong>Puntos Clave:</strong>
-            </p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-2 pl-4">
-              <li>Hiper-personalización y su impacto en la lealtad del cliente.</li>
-              <li>El rol de los LLMs en la generación de copys y contenido visual.</li>
-              <li>Privacidad de datos vs. efectividad de la IA: Encontrando el equilibrio.</li>
-              <li>Casos de éxito y lecciones aprendidas de pioneros en la industria.</li>
-            </ul>
-            <Button variant="link" className="p-0 h-auto mt-4 text-base">
-              Leer el informe completo (Próximamente)
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
     </PageContainer>
   );
 }
