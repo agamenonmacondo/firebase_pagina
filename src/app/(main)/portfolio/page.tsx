@@ -7,27 +7,6 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvaLogoIcon } from "@/components/AvaLogoIcon";
 
-const features = [
-    {
-        icon: <BotMessageSquare className="h-8 w-8 mb-4 text-primary" />,
-        title: "Asistente de Chat Inteligente",
-        description: "Interactúa con una IA conversacional diseñada para entender y ayudarte con tus tareas de marketing.",
-        link: "/"
-    },
-    {
-        icon: <Newspaper className="h-8 w-8 mb-4 text-primary" />,
-        title: "Herramientas para Newsletter",
-        description: "Genera contenido, analiza relevancia y define el tono perfecto para tus campañas de email.",
-        link: "/newsletter"
-    },
-    {
-        icon: <CheckCircle className="h-8 w-8 mb-4 text-primary" />,
-        title: "Análisis y Reportes",
-        description: "Obtén insights sobre el rendimiento de tu agente y el impacto de tus contenidos.",
-        link: "/dashboard"
-    }
-];
-
 const Overlay = ({ children }: { children: React.ReactNode }) => (
     <div className="relative z-10 bg-black bg-opacity-50 h-full">
         {children}
@@ -69,33 +48,6 @@ export default function PortfolioPage() {
                           </Link>
                       </Button>
                   </div>
-              </div>
-            </section>
-
-            {/* Features Section */}
-            <section className="mt-16 md:mt-24">
-              <div className="text-center mb-12">
-                  <h2 className="font-headline text-3xl md:text-4xl font-bold">Capacidades Principales</h2>
-                  <p className="text-lg max-w-2xl mx-auto mt-2 text-white/80">
-                      Descubre cómo AgenteAVA puede transformar tu flujo de trabajo.
-                  </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {features.map((feature, index) => (
-                      <Card
-                          key={index}
-                          className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up bg-white/10 backdrop-blur-sm text-white border-white/20"
-                          style={{animationDelay: `${0.4 + index * 0.1}s`}}
-                      >
-                          <CardHeader>
-                              <div className="flex justify-center text-white">{feature.icon}</div>
-                              <CardTitle className="font-headline text-2xl text-white">{feature.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                              <CardDescription className="text-white/80">{feature.description}</CardDescription>
-                          </CardContent>
-                      </Card>
-                  ))}
               </div>
             </section>
           </PageContainer>
