@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
@@ -558,5 +557,3 @@ export default function ChatPage() {
     </PageContainer>
   );
 }
-
-    

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
@@ -139,12 +138,12 @@ export function GlobalChatWidget() {
   };
 
   const handleExpandToMainChat = () => {
-    router.push('/chat');
+    router.push('/');
     setIsOpen(false); // Close the popover widget
   };
 
   // Don't render the widget on the main chat page itself
-  if (pathname === '/chat') {
+  if (pathname === '/') {
     return null;
   }
 
@@ -279,5 +278,3 @@ export function GlobalChatWidget() {
     </Popover>
   );
 }
-
-    
