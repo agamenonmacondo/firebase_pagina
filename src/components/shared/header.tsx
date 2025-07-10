@@ -27,8 +27,8 @@ export function Header() {
     return true;
   });
 
-  // Determine if the "AgenteAVA" logo link should go to dashboard or portfolio
-  const logoLinkHref = isAuthenticated ? "/dashboard" : "/portfolio";
+  // Determine if the "AgenteAVA" logo link should go to dashboard or home
+  const logoLinkHref = isAuthenticated ? "/dashboard" : "/";
 
 
   return (
@@ -70,3 +70,5 @@ export function Header() {
     </header>
   );
 }
+
+    

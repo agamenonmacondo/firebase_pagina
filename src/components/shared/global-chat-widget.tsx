@@ -139,12 +139,12 @@ export function GlobalChatWidget() {
   };
 
   const handleExpandToMainChat = () => {
-    router.push('/');
+    router.push('/chat');
     setIsOpen(false); // Close the popover widget
   };
 
   // Don't render the widget on the main chat page itself
-  if (pathname === '/') {
+  if (pathname === '/chat') {
     return null;
   }
 
@@ -279,3 +279,5 @@ export function GlobalChatWidget() {
     </Popover>
   );
 }
+
+    
