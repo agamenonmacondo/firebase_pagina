@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
-import { Home, LayoutList, Newspaper, LogIn, LayoutDashboard, Briefcase } from 'lucide-react';
-import { MessageCircle } from 'lucide-react';
+import { LayoutList, Newspaper, LogIn, LayoutDashboard, Briefcase, MessageCircle } from 'lucide-react';
+
 export interface NavItem {
   label: string;
   href: string;
@@ -11,7 +11,8 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'AVA Assistant', href: '/', icon: Home },
-  { label: 'AVA Chat', href: '/chat', icon: MessageCircle },
+  { label: 'AVA Assistant', href: '/chat', icon: MessageCircle },
+  { label: 'Noticias', href: '/project', icon: Newspaper },
+  { label: 'Arquitectura', href: '/architecture', icon: LayoutDashboard },
   { label: 'Login', href: '/login', icon: LogIn, hideWhenAuthed: true },
 ];
